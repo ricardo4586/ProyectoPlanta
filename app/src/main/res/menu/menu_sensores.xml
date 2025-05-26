@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_home" android:title="Clima" />
+        <item
+            android:id="@+id/nav_temperature"
+            android:title="Temperatura" />
+        <item
+            android:id="@+id/nav_humidity"
+            android:title="Humedad" />
+        <item
+            android:id="@+id/nav_light"
+            android:title="Luz" />
+        <item
+            android:id="@+id/nav_npk"
+            android:title="NPK" />
+    </group>
+</menu>

@@ -1,86 +1,110 @@
 package com.example.proyectoplata
 
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.proyectoplata.network.WeatherRepository
-import com.example.proyectoplata.firebase.MyFirebaseMessagingService
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
+import androidx.appcompat.widget.Toolbar
+import androidx.drawerlayout.widget.DrawerLayout
 import com.google.firebase.messaging.FirebaseMessaging
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import androidx.appcompat.app.ActionBarDrawerToggle
+import com.google.android.material.navigation.NavigationView
+import androidx.fragment.app.Fragment // Importar la clase base Fragment
+
+// Importaciones de tus fragmentos (asegúrate de que estas rutas sean correctas)
+import com.example.proyectoplata.fragments.HomeFragment // ¡Importamos HomeFragment!
+import com.example.proyectoplata.fragments.TemperatureFragment
+import com.example.proyectoplata.fragments.HumidityFragment
+import com.example.proyectoplata.fragments.LightFragment
+import com.example.proyectoplata.fragments.NPKFragment
+
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var codigoIsoEditText: EditText
-    private lateinit var ciudadNombreEditText: EditText
-    private lateinit var obtenerButton: Button
+    // Ya NO se necesitan estas declaraciones aquí. Ahora están en HomeFragment o en los fragmentos de gráficos.
+    // private lateinit var codigoIsoEditText: EditText
+    // private lateinit var ciudadNombreEditText: EditText
+    // private lateinit var obtenerButton: Button
+    // private lateinit var temperaturaActualTextView: TextView
+    // private lateinit var temperaturaMinimaTextView: TextView
+    // private lateinit var temperaturaMaximaTextView: TextView
+    // private lateinit var lineChartTemperature: LineChart
+    // private lateinit var lineChartHumidity: LineChart
+    // private lateinit var lineChartLight: LineChart
+    // private lateinit var lineChartNPK: LineChart
+    // private val apiKey = "aa8782089df8fb9de8b95f66b22f29f9"
+    // private val weatherRepository = WeatherRepository()
 
-    private lateinit var temperaturaActualTextView: TextView
-    private lateinit var temperaturaMinimaTextView: TextView
-    private lateinit var temperaturaMaximaTextView: TextView
-
-    private val apiKey = "aa8782089df8fb9de8b95f66b22f29f9" // Usar tu propia API Key
-
-    // Instanciamos el repositorio
-    private val weatherRepository = WeatherRepository()
+    private lateinit var toolbar: Toolbar
+    private lateinit var drawerLayout: DrawerLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Inicialización de vistas
-        codigoIsoEditText = findViewById(R.id.codigo_iso)
-        ciudadNombreEditText = findViewById(R.id.ciudad_nombre)
-        obtenerButton = findViewById(R.id.obtener_button)
+        // Inicialización de Toolbar
+        toolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
 
-        temperaturaActualTextView = findViewById(R.id.temperatura_actual)
-        temperaturaMinimaTextView = findViewById(R.id.temperatura_minima)
-        temperaturaMaximaTextView = findViewById(R.id.temperatura_maxima)
+        // Inicialización del DrawerLayout y NavigationView
+        drawerLayout = findViewById(R.id.drawer_layout)
+        val navView: NavigationView = findViewById(R.id.nav_view)
 
-        // Acción al presionar el botón de obtener
-        obtenerButton.setOnClickListener {
-            val codigoIso = codigoIsoEditText.text.toString()
-            val ciudadNombre = ciudadNombreEditText.text.toString()
+        // Agregar ActionBarDrawerToggle (para el icono de hamburguesa)
+        val toggle = ActionBarDrawerToggle(
+            this, drawerLayout, toolbar, R.string.openDrawer, R.string.closeDrawer
+        )
+        drawerLayout.addDrawerListener(toggle)
+        toggle.syncState()
 
-            if (ciudadNombre.isNotEmpty() && codigoIso.isNotEmpty()) {
-                fetchWeatherData(ciudadNombre)
-            } else {
-                Toast.makeText(this, "Por favor, ingrese el código y la ciudad", Toast.LENGTH_SHORT).show()
-            }
-        }
-
-        // Obtener el token FCM y mostrarlo
-        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
-            if (!task.isSuccessful) {
-                // Si no se puede obtener el token
-                return@addOnCompleteListener
-            }
-
-            // Obtener el token
-            val token = task.result
-            println("FCM Token: $token")  // Puedes enviar este token a tu servidor si lo necesitas
-        }
-    }
-
-    private fun fetchWeatherData(cityName: String) {
-        GlobalScope.launch(Dispatchers.IO) {
-            val weather = weatherRepository.fetchWeatherData(cityName, apiKey)
-
-            withContext(Dispatchers.Main) {
-                if (weather != null) {
-                    temperaturaActualTextView.text = "Actual: ${weather.main.temp}°C"
-                    temperaturaMinimaTextView.text = "Mínima: ${weather.main.temp_min}°C"
-                    temperaturaMaximaTextView.text = "Máxima: ${weather.main.temp_max}°C"
-                } else {
-                    Toast.makeText(this@MainActivity, "Error al obtener el clima", Toast.LENGTH_SHORT).show()
+        // Configuración del NavigationView: maneja los clics en los ítems del menú
+        navView.setNavigationItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.nav_home -> { // Ítem para la pestaña de Clima
+                    replaceFragment(HomeFragment())
+                    supportActionBar?.title = "Clima" // Título en la Toolbar
+                }
+                R.id.nav_temperature -> {
+                    replaceFragment(TemperatureFragment())
+                    supportActionBar?.title = "Temperatura"
+                }
+                R.id.nav_humidity -> {
+                    replaceFragment(HumidityFragment())
+                    supportActionBar?.title = "Humedad"
+                }
+                R.id.nav_light -> {
+                    replaceFragment(LightFragment())
+                    supportActionBar?.title = "Luz"
+                }
+                R.id.nav_npk -> {
+                    replaceFragment(NPKFragment())
+                    supportActionBar?.title = "NPK"
                 }
             }
+            drawerLayout.closeDrawers() // Cierra el Drawer después de la selección
+            true
+        }
+
+        // Establecer el fragmento por defecto al iniciar la actividad
+        if (savedInstanceState == null) {
+            replaceFragment(HomeFragment()) // ¡Carga el HomeFragment como pantalla inicial!
+            supportActionBar?.title = "Clima" // Título inicial de la Toolbar
+            navView.setCheckedItem(R.id.nav_home) // Marca el ítem "Clima" en el Drawer
+        }
+
+        // Obtener el token FCM y mostrarlo (puede quedarse aquí o moverse según sea necesario)
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                return@addOnCompleteListener
+            }
+            val token = task.result
+            println("FCM Token: $token")
         }
     }
-}
 
+    // Función para reemplazar fragmentos (es crucial y debe quedarse aquí)
+    private fun replaceFragment(fragment: Fragment) {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment) // 'fragment_container' es el ID del FrameLayout en activity_main.xml
+            .commit()
+    }
+}

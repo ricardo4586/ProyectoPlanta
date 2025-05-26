@@ -1,89 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.drawerlayout.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:fitsSystemWindows="true"
+    tools:openDrawer="start">
 
-    <!-- Título -->
-    <TextView
-        android:id="@+id/label_clima"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Clima"
-        android:textSize="24sp"
-        android:textColor="#000000"
-        android:layout_gravity="center"/>
-
-    <!-- Campo Código ISO -->
-    <EditText
-        android:id="@+id/codigo_iso"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Código ISO del País"
-        android:inputType="text"
-        android:layout_marginTop="16dp"
-        android:padding="12dp"/>
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <!-- Campo Nombre de Ciudad -->
-    <EditText
-        android:id="@+id/ciudad_nombre"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Nombre de Ciudad"
-        android:inputType="text"
-        android:layout_marginTop="8dp"
-        android:padding="12dp"/>
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:titleTextColor="@android:color/white"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
 
-    <!-- Botón Obtener -->
-    <Button
-        android:id="@+id/obtener_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="OBTENER"
-        android:backgroundTint="#9C27B0"
-        android:textColor="#ffffff"
-        android:layout_marginTop="16dp"
-        android:padding="12dp"/>
+        <FrameLayout
+            android:id="@+id/fragment_container"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
-    <!-- Sección de Temperatura -->
-    <TextView
-        android:id="@+id/label_temperatura"
+    </LinearLayout>
+
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/nav_view"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Temperatura"
-        android:textSize="20sp"
-        android:textColor="#000000"
-        android:layout_marginTop="24dp"
-        android:layout_gravity="center"/>
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:fitsSystemWindows="true"
+        app:menu="@menu/menu_sensores" />
 
-    <!-- Temperatura Actual -->
-    <TextView
-        android:id="@+id/temperatura_actual"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Actual: 18.52°C"
-        android:textColor="#000000"
-        android:textSize="18sp"
-        android:layout_marginTop="8dp"/>
-
-    <!-- Temperatura Mínima -->
-    <TextView
-        android:id="@+id/temperatura_minima"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Mínima: 18.37°C"
-        android:textColor="#000000"
-        android:textSize="18sp"
-        android:layout_marginTop="8dp"/>
-
-    <!-- Temperatura Máxima -->
-    <TextView
-        android:id="@+id/temperatura_maxima"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Máxima: 18.52°C"
-        android:textColor="#000000"
-        android:textSize="18sp"
-        android:layout_marginTop="8dp"/>
-</LinearLayout>
+</androidx.drawerlayout.widget.DrawerLayout>

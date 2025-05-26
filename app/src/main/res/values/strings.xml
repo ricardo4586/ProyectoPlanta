@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">proyectoplata</string>
+    <string name="app_name">ProyectoPlata</string>
+    <string name="openDrawer">Abrir menú de navegación</string>
+    <string name="closeDrawer">Cerrar menú de navegación</string>
 </resources>
