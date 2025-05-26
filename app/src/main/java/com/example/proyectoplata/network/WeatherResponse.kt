@@ -7,8 +7,8 @@ data class WeatherResponse(
 
 data class Main(
     val temp: Double,
-    val temp_min: Double,  // Agregar temp_min
-    val temp_max: Double,  // Agregar temp_max
+    val temp_min: Double,
+    val temp_max: Double,
     val humidity: Int
 )
 
