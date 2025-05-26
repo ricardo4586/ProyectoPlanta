@@ -1,4 +1,4 @@
-package com.example.proyectoplata.fragments // Asegúrate de que este sea el paquete correcto
+package com.example.proyectoplata.fragments
 
 import android.graphics.Color
 import android.os.Bundle
@@ -11,36 +11,35 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.utils.ColorTemplate
-import com.example.proyectoplata.R // Puede que necesites esta importación explícita
+import com.example.proyectoplata.R // Necesario para R.layout y R.id
 
-class HumidityFragment : Fragment() {
+class HumidityFragment : Fragment() { // <-- ¡IMPORTANTE! Nombre de la clase corregido
 
-    private lateinit var lineChartHumidity: LineChart
+    private lateinit var lineChartHumidity: LineChart // <-- Nombre de la variable corregido
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_humidity, container, false)
+        val view = inflater.inflate(R.layout.fragment_humidity, container, false) // <-- Layout corregido
 
-        // Asegúrate de que el ID en fragment_humidity.xml sea 'lineChartHumidityFragment'
-        lineChartHumidity = view.findViewById(R.id.lineChartHumidityFragment)
-        setupHumidityChart()
+        lineChartHumidity = view.findViewById(R.id.lineChartHumidityFragment) // <-- ID del LineChart corregido
+        setupHumidityChart() // <-- Nombre del método corregido
 
         return view
     }
 
-    private fun setupHumidityChart() {
-        val humidityData = ArrayList<Entry>()
-        // Datos de ejemplo para el gráfico de humedad
-        humidityData.add(Entry(0f, 60f))
-        humidityData.add(Entry(1f, 65f))
+    private fun setupHumidityChart() { // <-- Nombre del método corregido
+        val humidityData = ArrayList<Entry>() // <-- Nombre de la lista de datos corregido
+        // Datos de ejemplo para humedad (ajusta estos valores si tienes datos reales)
+        humidityData.add(Entry(0f, 65f))
+        humidityData.add(Entry(1f, 68f))
         humidityData.add(Entry(2f, 70f))
-        humidityData.add(Entry(3f, 68f))
+        humidityData.add(Entry(3f, 67f))
         humidityData.add(Entry(4f, 72f))
 
-        val dataSet = LineDataSet(humidityData, "Humedad (%)")
-        dataSet.color = ColorTemplate.MATERIAL_COLORS[1] // Cambia el color si quieres
+        val dataSet = LineDataSet(humidityData, "Humedad (%)") // <-- Etiqueta del DataSet corregida
+        dataSet.color = ColorTemplate.MATERIAL_COLORS[1] // Usar un color diferente para distinguirlo
         dataSet.valueTextColor = Color.BLACK
         dataSet.setDrawCircles(true)
         dataSet.setDrawValues(false)

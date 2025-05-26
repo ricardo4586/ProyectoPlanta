@@ -1,3 +1,5 @@
+import java.util.Properties // Importación necesaria para 'Properties'
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -17,6 +19,15 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // *** CONFIGURACIÓN PARA OCULTAR LA CLAVE API ***
+        val properties = Properties()
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            properties.load(localPropertiesFile.inputStream())
+        }
+        buildConfigField("String", "OPEN_WEATHER_API_KEY", properties.getProperty("WEATHER_API_KEY") ?: "\"aa8782089df8fb9de8b95f66b22f29f9\"")
+        // *** FIN CONFIGURACIÓN CLAVE API ***
     }
 
     buildTypes {
@@ -40,61 +51,56 @@ android {
 
     buildFeatures {
         compose = true
+        viewBinding = true
+        buildConfig = true // <--- ¡AÑADE ESTA LÍNEA! Esto habilitará la generación de BuildConfig con campos personalizados.
     }
 }
 
 dependencies {
-    // Librerías de AndroidX y Kotlin (actualizadas)
-    implementation(libs.androidx.core.ktx) // Asumo que libs.androidx.core.ktx apunta a una versión reciente como 1.13.1
+    // Librerías de AndroidX y Kotlin
+    implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose) // Si estás mezclando Views con Compose, esto está bien.
+    implementation(libs.androidx.activity.compose)
+    implementation("androidx.fragment:fragment-ktx:1.8.0")
 
-    // Dependencias fundamentales de UI (ACTUALIZADAS y COMPATIBLES)
-    // androidx.appcompat es la base para la mayoría de las funcionalidades de compatibilidad
-    implementation("androidx.appcompat:appcompat:1.7.0") // ¡ACTUALIZADO!
-    // Material Design components - Necesario para NavigationView, etc.
-    implementation("com.google.android.material:material:1.12.0") // ¡ACTUALIZADO!
-    // Para el DrawerLayout
-    implementation("androidx.drawerlayout:drawerlayout:1.2.0") // ¡ACTUALIZADO!
+    // Dependencias fundamentales de UI
+    implementation("androidx.appcompat:appcompat:1.7.0")
+    implementation("com.google.android.material:material:1.12.0")
+    implementation("androidx.drawerlayout:drawerlayout:1.2.0")
+
 
     // Librerías de Jetpack Compose (mantengo las que ya tienes y el BOM)
-    implementation(platform(libs.androidx.compose.bom)) // Asegúrate de que tu compose.bom sea reciente, ej. 2024.06.00
+    implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3) // Si usas Material Design 3 en Compose
+    implementation(libs.androidx.material3)
 
-    // Librerías de Gráficos
-    // Si NO usas Jetpack Compose para los gráficos, ELIMINA la siguiente línea:
-    // implementation("com.github.tehras:charts:0.2.4-alpha")
-    // Mantén MPAndroidChart si tus gráficos son con vistas tradicionales
-    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0") // Versión estable popular.
+    // Librerías de Gráficos (MPAndroidChart)
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
 
-    implementation("androidx.appcompat:appcompat:1.3.1")
-    // Recuerda añadir jitpack.io en settings.gradle si no lo tienes.
-
-    // Librerías de Firebase (ACTUALIZADAS)
-    // El BOM (Bill Of Materials) gestiona las versiones de Firebase por ti
-    implementation(platform("com.google.firebase:firebase-bom:33.14.0")) // Versión estable y reciente del BOM
-    // Firebase Cloud Messaging. El BOM define su versión, no necesitas especificarla aquí.
+    // Librerías de Firebase (El BOM gestiona las versiones)
+    implementation(platform("com.google.firebase:firebase-bom:33.14.0"))
     implementation("com.google.firebase:firebase-messaging")
+    implementation("com.google.firebase:firebase-auth-ktx")
 
-    // Librerías de Retrofit y OkHttp (ACTUALIZADAS)
+    // Kotlin Coroutines para Firebase (para usar .await() en tareas de Firebase)
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
+
+
+    // Librerías de Retrofit y OkHttp
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-    // OkHttp actualizado para compatibilidad y mejoras
-    implementation("com.squareup.okhttp3:okhttp:4.12.0") // ¡ACTUALIZADO!
-    // Opcional: si necesitas ver los logs de las peticiones de red
-    // implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
-    // Librerías de Testing (mantengo las que ya tienes)
+    // Librerías de Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
 
-    // Librerías de Debug (mantengo las que ya tienes)
+    // Librerías de Debug
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 }

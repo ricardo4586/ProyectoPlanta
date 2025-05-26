@@ -1,14 +1,13 @@
-package com.example.proyectoplata.network // Asegúrate de usar el nombre correcto de tu paquete
+package com.example.proyectoplata.network
 
-import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-interface WeatherApi {
-    @GET("weather")
+interface WeatherApiService {
+    @GET("data/2.5/weather") // La ruta base de la API de OpenWeatherMap
     suspend fun getWeather(
-        @Query("q") city: String, // Ciudad (puedes cambiarla por cualquier ciudad)
-        @Query("appid") appid: String, // API Key de OpenWeatherMap
-        @Query("units") units: String = "metric" // Unidades (Celsius)
-    ): Response<WeatherResponse>
+        @Query("q") query: String, // Aquí pasamos "ciudad,codigo_iso"
+        @Query("appid") apiKey: String,
+        @Query("units") units: String = "metric" // Para obtener temperaturas en Celsius
+    ): retrofit2.Response<WeatherResponse> // Cambiado a retrofit2.Response
 }

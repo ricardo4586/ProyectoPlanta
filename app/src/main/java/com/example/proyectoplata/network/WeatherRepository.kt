@@ -1,16 +1,13 @@
 package com.example.proyectoplata.network
 
 import android.util.Log
-import com.example.proyectoplata.network.RetrofitInstance
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import retrofit2.Response
 
 class WeatherRepository {
 
-    suspend fun fetchWeatherData(cityName: String, apiKey: String): WeatherResponse? {
+    // La firma de esta función debe coincidir con la llamada en HomeFragment (query, apiKey)
+    suspend fun fetchWeatherData(query: String, apiKey: String): WeatherResponse? {
         try {
-            val response = RetrofitInstance.api.getWeather(cityName, apiKey)
+            val response = RetrofitInstance.api.getWeather(query, apiKey)
             if (response.isSuccessful) {
                 return response.body()
             } else {

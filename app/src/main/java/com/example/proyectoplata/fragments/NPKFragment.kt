@@ -1,4 +1,4 @@
-package com.example.proyectoplata.fragments // Asegúrate de que este sea el paquete correcto
+package com.example.proyectoplata.fragments
 
 import android.graphics.Color
 import android.os.Bundle
@@ -11,7 +11,7 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.utils.ColorTemplate
-import com.example.proyectoplata.R // Puede que necesites esta importación explícita
+import com.example.proyectoplata.R // Necesario para R.layout y R.id
 
 class NPKFragment : Fragment() {
 
@@ -23,7 +23,6 @@ class NPKFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_npk, container, false)
 
-        // Asegúrate de que el ID en fragment_npk.xml sea 'lineChartNPKFragment'
         lineChartNPK = view.findViewById(R.id.lineChartNPKFragment)
         setupNPKChart()
 
@@ -32,8 +31,6 @@ class NPKFragment : Fragment() {
 
     private fun setupNPKChart() {
         val npkData = ArrayList<Entry>()
-        // Datos de ejemplo para el gráfico NPK (pueden ser valores de N, P, K o un índice combinado)
-        // Aquí usamos un valor simple como ejemplo
         npkData.add(Entry(0f, 0.5f))
         npkData.add(Entry(1f, 0.7f))
         npkData.add(Entry(2f, 0.6f))
@@ -41,7 +38,7 @@ class NPKFragment : Fragment() {
         npkData.add(Entry(4f, 0.75f))
 
         val dataSet = LineDataSet(npkData, "NPK (Índice)")
-        dataSet.color = ColorTemplate.MATERIAL_COLORS[3] // Cambia el color si quieres
+        dataSet.color = ColorTemplate.MATERIAL_COLORS[3]
         dataSet.valueTextColor = Color.BLACK
         dataSet.setDrawCircles(true)
         dataSet.setDrawValues(false)

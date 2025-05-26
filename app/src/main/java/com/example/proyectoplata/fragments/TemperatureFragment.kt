@@ -1,4 +1,4 @@
-package com.example.proyectoplata.fragments // Asegúrate de que este sea el paquete correcto
+package com.example.proyectoplata.fragments
 
 import android.graphics.Color
 import android.os.Bundle
@@ -21,19 +21,16 @@ class TemperatureFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Infla el layout para este fragmento
         val view = inflater.inflate(R.layout.fragment_temperature, container, false)
 
-        // Inicializa el gráfico de temperatura con el ID CORRECTO del XML
         lineChartTemperature = view.findViewById(R.id.lineChartTemperatureFragment)
-        setupTemperatureChart() // Llama a la función para configurar los datos del gráfico
+        setupTemperatureChart()
 
         return view
     }
 
     private fun setupTemperatureChart() {
         val temperatureData = ArrayList<Entry>()
-        // Datos de ejemplo para el gráfico de temperatura
         temperatureData.add(Entry(0f, 22.5f))
         temperatureData.add(Entry(1f, 23.0f))
         temperatureData.add(Entry(2f, 21.8f))
@@ -44,13 +41,13 @@ class TemperatureFragment : Fragment() {
         dataSet.color = ColorTemplate.MATERIAL_COLORS[0]
         dataSet.valueTextColor = Color.BLACK
         dataSet.setDrawCircles(true)
-        dataSet.setDrawValues(false) // No muestra los valores sobre los puntos
+        dataSet.setDrawValues(false)
 
         val lineData = LineData(dataSet)
         lineChartTemperature.data = lineData
-        lineChartTemperature.description.isEnabled = false // Oculta la descripción por defecto
-        lineChartTemperature.setTouchEnabled(true) // Permite interactuar con el gráfico
-        lineChartTemperature.setPinchZoom(true) // Permite zoom con dos dedos
-        lineChartTemperature.invalidate() // Refresca el gráfico
+        lineChartTemperature.description.isEnabled = false
+        lineChartTemperature.setTouchEnabled(true)
+        lineChartTemperature.setPinchZoom(true)
+        lineChartTemperature.invalidate()
     }
 }
