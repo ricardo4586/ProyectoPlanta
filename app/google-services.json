@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "61678919210",
+    "project_id": "adrointeligente",
+    "storage_bucket": "adrointeligente.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:61678919210:android:9896ff807773dcd95c6d53",
+        "android_client_info": {
+          "package_name": "com.example.proyectoplata"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBHS34blnp3zvUMp8OEyXjFrCCQWkM6MyQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
