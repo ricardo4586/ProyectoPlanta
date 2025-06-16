@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    tools:context=".fragments.GeminiFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:gravity="center_horizontal">
+
+        <!-- Título de la sección de recomendación automática -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Recomendación de Cuidado (Generada automáticamente)"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp"
+            android:textColor="?android:attr/textColorPrimary"/>
+
+        <!-- TextView para la recomendación automática de Gemini -->
+        <TextView
+            android:id="@+id/tvGeminiRecommendation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="100dp"
+            android:background="@drawable/rounded_corners_background"
+            android:padding="12dp"
+            android:text="Esperando datos de sensores para generar recomendación..."
+            android:textColor="?android:attr/textColorSecondary"
+            android:textSize="16sp"
+            android:layout_marginBottom="24dp"/>
+
+        <!-- Separador -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Título de la sección de consulta de usuario -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Haz una Pregunta a Gemini"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp"
+            android:textColor="?android:attr/textColorPrimary"/>
+
+        <!-- Campo de texto para la pregunta del usuario a Gemini -->
+        <EditText
+            android:id="@+id/etUserQuery"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Pregunta a Gemini..."
+            android:inputType="textMultiLine"
+            android:minLines="2"
+            android:maxLines="4"
+            android:background="@drawable/rounded_corners_edittext"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp"
+            android:gravity="top"/>
+
+        <!-- Botón para enviar la pregunta a Gemini -->
+        <Button
+            android:id="@+id/btnSendQuery"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ENVIAR"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
+            android:background="@drawable/rounded_button_background"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            android:elevation="4dp"
+            android:stateListAnimator="@null"
+            android:layout_marginBottom="24dp"/>
+
+        <!-- TextView para la respuesta a la pregunta del usuario -->
+        <TextView
+            android:id="@+id/tvUserQueryResponse"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="100dp"
+            android:background="@drawable/rounded_corners_background"
+            android:padding="12dp"
+            android:text="Tu respuesta de Gemini aparecerá aquí."
+            android:textColor="?android:attr/textColorSecondary"
+            android:textSize="16sp" />
+
+    </LinearLayout>
+
+</ScrollView>

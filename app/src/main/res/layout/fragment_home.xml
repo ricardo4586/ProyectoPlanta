@@ -1,93 +1,179 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".fragments.HomeFragment">
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/temperaturaActual"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:text="Temperatura Actual Clima: N/A"
+        android:textSize="18sp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp" />
 
-        <TextView
-            android:id="@+id/label_clima"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Clima"
-            android:textSize="24sp"
-            android:textColor="#000000"
-            android:layout_gravity="center"/>
+    <TextView
+        android:id="@+id/temperaturaMinima"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Mínima Clima: N/A"
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/temperaturaActual"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="16dp" />
 
-        <EditText
-            android:id="@+id/codigo_iso"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Código ISO del País"
-            android:inputType="text"
-            android:layout_marginTop="16dp"
-            android:padding="12dp"
-            android:minHeight="48dp"
-            android:background="@drawable/rounded_edittext_bg"/>
+    <TextView
+        android:id="@+id/temperaturaMaxima"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Máxima Clima: N/A"
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/temperaturaMinima"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="16dp" />
 
-        <EditText
-            android:id="@+id/ciudad_nombre"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Nombre de Ciudad"
-            android:inputType="text"
-            android:layout_marginTop="8dp"
-            android:padding="12dp"
-            android:minHeight="48dp"
-            android:background="@drawable/rounded_edittext_bg"/>
+    <EditText
+        android:id="@+id/ciudadNombre"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Nombre de la ciudad"
+        android:inputType="text"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintTop_toBottomOf="@id/temperaturaMaxima"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/codigoIso" />
 
-        <Button
-            android:id="@+id/obtener_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="OBTENER"
-            android:backgroundTint="#9C27B0"
-            android:textColor="#ffffff"
-            android:layout_marginTop="16dp"
-            android:padding="12dp"/>
+    <EditText
+        android:id="@+id/codigoIso"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:hint="ISO"
+        android:inputType="textCapCharacters"
+        android:maxLength="2"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintTop_toBottomOf="@id/temperaturaMaxima"
+        app:layout_constraintStart_toEndOf="@id/ciudadNombre"
+        app:layout_constraintEnd_toEndOf="parent" />
 
-        <TextView
-            android:id="@+id/label_temperatura"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Temperatura (API del Clima)"
-            android:textSize="20sp"
-            android:textColor="#000000"
-            android:layout_marginTop="24dp"
-            android:layout_gravity="center"/>
+    <Button
+        android:id="@+id/obtenerButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Obtener Clima"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintTop_toBottomOf="@id/ciudadNombre"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
-        <TextView
-            android:id="@+id/temperatura_actual"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Actual: N/A"
-            android:textColor="#000000"
-            android:textSize="18sp"
-            android:layout_marginTop="8dp"/>
+    <!-- ELIMINADO: TextView para Temperatura Ambiental -->
+    <!-- <TextView
+        android:id="@+id/tvTemperaturaActual"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Temperatura Ambiental: N/A"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_marginTop="24dp"
+        app:layout_constraintTop_toBottomOf="@id/obtenerButton"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="16dp" /> -->
 
-        <TextView
-            android:id="@+id/temperatura_minima"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Mínima: N/A"
-            android:textColor="#000000"
-            android:textSize="18sp"
-            android:layout_marginTop="8dp"/>
+    <TextView
+        android:id="@+id/tvHumedadActual"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Humedad Ambiental: N/A"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/obtenerButton"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="24dp"
+        android:layout_marginStart="16dp" />
 
-        <TextView
-            android:id="@+id/temperatura_maxima"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Máxima: N/A"
-            android:textColor="#000000"
-            android:textSize="18sp"
-            android:layout_marginTop="8dp"/>
+    <TextView
+        android:id="@+id/tvHumedadSueloActual"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Humedad del Suelo: N/A"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/tvHumedadActual"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="4dp"
+        android:layout_marginStart="16dp" />
 
-    </LinearLayout>
-</ScrollView>
+    <TextView
+        android:id="@+id/tvIndiceUvActual"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Índice UV: N/A"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/tvHumedadSueloActual"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="4dp"
+        android:layout_marginStart="16dp" />
+
+    <TextView
+        android:id="@+id/tvVoltajeUvaActual"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Voltaje UVA: N/A"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/tvIndiceUvActual"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="4dp"
+        android:layout_marginStart="16dp" />
+
+    <TextView
+        android:id="@+id/tvNitrogenoActual"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Nitrógeno (N): N/A"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/tvVoltajeUvaActual"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="4dp"
+        android:layout_marginStart="16dp" />
+
+    <TextView
+        android:id="@+id/tvFosforoActual"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Fósforo (P): N/A"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/tvNitrogenoActual"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="4dp"
+        android:layout_marginStart="16dp" />
+
+    <TextView
+        android:id="@+id/tvPotasioActual"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Potasio (K): N/A"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/tvFosforoActual"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="4dp"
+        android:layout_marginStart="16dp" />
+
+    <!-- LOS ELEMENTOS DE GEMINI HAN SIDO ELIMINADOS DE AQUÍ -->
+    <!-- (etUserQuery, btnSendQuery, tvGeminiRecommendation, tvUserQueryResponse ya no están) -->
+
+</androidx.constraintlayout.widget.ConstraintLayout>

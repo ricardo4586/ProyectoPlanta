@@ -1,54 +1,224 @@
 package com.example.proyectoplata.fragments
 
-import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import android.widget.Toast
+import androidx.annotation.NonNull
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.Observer
+import com.example.proyectoplata.databinding.FragmentHumidityBinding
+import com.example.proyectoplata.models.SensorValueData
+import com.example.proyectoplata.SharedSensorViewModel
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
-import com.github.mikephil.charting.utils.ColorTemplate
-import com.example.proyectoplata.R // Necesario para R.layout y R.id
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet // Importa ILineDataSet
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
-class HumidityFragment : Fragment() { // <-- ¡IMPORTANTE! Nombre de la clase corregido
+class HumidityFragment : Fragment() {
 
-    private lateinit var lineChartHumidity: LineChart // <-- Nombre de la variable corregido
+    private val TAG = "HumidityFragment"
+    private var _binding: FragmentHumidityBinding? = null
+    private val binding get() = _binding!!
+
+    private lateinit var firebaseDatabase: FirebaseDatabase
+    private lateinit var humedadAmbientalRef: DatabaseReference
+    private lateinit var humedadSueloRef: DatabaseReference
+    private lateinit var sharedSensorViewModel: SharedSensorViewModel
+
+    private lateinit var humidityChart: LineChart
+    private lateinit var tvHumedadActualAmbiental: TextView
+    private lateinit var tvHumedadActualSuelo: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.fragment_humidity, container, false) // <-- Layout corregido
+    ): View {
+        _binding = FragmentHumidityBinding.inflate(inflater, container, false)
+        val view = binding.root
 
-        lineChartHumidity = view.findViewById(R.id.lineChartHumidityFragment) // <-- ID del LineChart corregido
-        setupHumidityChart() // <-- Nombre del método corregido
+        firebaseDatabase = FirebaseDatabase.getInstance()
+        humedadAmbientalRef = firebaseDatabase.getReference("sensores/humedad_ambiental")
+        humedadSueloRef = firebaseDatabase.getReference("sensores/humedad_suelo")
+
+        sharedSensorViewModel = ViewModelProvider(requireActivity()).get(SharedSensorViewModel::class.java)
+
+        tvHumedadActualAmbiental = binding.tvHumedadActualAmbiental
+        tvHumedadActualSuelo = binding.tvHumedadActualSuelo
+        humidityChart = binding.humidityLineChart
+
+        setupChart(humidityChart)
+        observeViewModel()
+        readHumidityData()
 
         return view
     }
 
-    private fun setupHumidityChart() { // <-- Nombre del método corregido
-        val humidityData = ArrayList<Entry>() // <-- Nombre de la lista de datos corregido
-        // Datos de ejemplo para humedad (ajusta estos valores si tienes datos reales)
-        humidityData.add(Entry(0f, 65f))
-        humidityData.add(Entry(1f, 68f))
-        humidityData.add(Entry(2f, 70f))
-        humidityData.add(Entry(3f, 67f))
-        humidityData.add(Entry(4f, 72f))
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+    }
 
-        val dataSet = LineDataSet(humidityData, "Humedad (%)") // <-- Etiqueta del DataSet corregida
-        dataSet.color = ColorTemplate.MATERIAL_COLORS[1] // Usar un color diferente para distinguirlo
-        dataSet.valueTextColor = Color.BLACK
-        dataSet.setDrawCircles(true)
-        dataSet.setDrawValues(false)
+    private fun readHumidityData() {
+        humedadAmbientalRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(@NonNull snapshot: DataSnapshot) {
+                val entries = ArrayList<Entry>()
+                var latestHumidity: Double = -1.0
 
-        val lineData = LineData(dataSet)
-        lineChartHumidity.data = lineData
-        lineChartHumidity.description.isEnabled = false
-        lineChartHumidity.setTouchEnabled(true)
-        lineChartHumidity.setPinchZoom(true)
-        lineChartHumidity.invalidate()
+                for (childSnapshot in snapshot.children) {
+                    val sensorValueData = childSnapshot.getValue(SensorValueData::class.java)
+                    sensorValueData?.let { data ->
+                        latestHumidity = data.valor
+                        val timestamp = convertDateToTimestamp(data.fecha)
+                        if (timestamp != -1L) {
+                            entries.add(Entry(timestamp.toFloat(), data.valor.toFloat()))
+                        }
+                    }
+                }
+                entries.sortBy { it.x }
+
+                sharedSensorViewModel.updateHumidity(latestHumidity)
+                sharedSensorViewModel.updateHumidityEntries(entries)
+
+                if (!snapshot.exists()) {
+                    Log.d(TAG, "No se encontraron datos de humedad ambiental en Firebase.")
+                    if (isAdded) {
+                        Toast.makeText(requireContext(), "No hay datos de humedad ambiental disponibles.", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+
+            override fun onCancelled(@NonNull error: DatabaseError) {
+                Log.e(TAG, "Error al leer datos de humedad ambiental de Firebase: ${error.message}", error.toException())
+                if (isAdded) {
+                    Toast.makeText(requireContext(), "Error de Firebase Humedad Ambiental: ${error.message}", Toast.LENGTH_LONG).show()
+                }
+            }
+        })
+
+        humedadSueloRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(@NonNull snapshot: DataSnapshot) {
+                val entries = ArrayList<Entry>()
+                var latestHumiditySuelo: Double = -1.0
+
+                for (childSnapshot in snapshot.children) {
+                    val sensorValueData = childSnapshot.getValue(SensorValueData::class.java)
+                    sensorValueData?.let { data ->
+                        latestHumiditySuelo = data.valor
+                        val timestamp = convertDateToTimestamp(data.fecha)
+                        if (timestamp != -1L) {
+                            entries.add(Entry(timestamp.toFloat(), data.valor.toFloat()))
+                        }
+                    }
+                }
+                entries.sortBy { it.x }
+
+                sharedSensorViewModel.updateHumiditySuelo(latestHumiditySuelo)
+                sharedSensorViewModel.updateHumiditySueloEntries(entries)
+
+                if (!snapshot.exists()) {
+                    Log.d(TAG, "No se encontraron datos de humedad del suelo en Firebase.")
+                }
+            }
+
+            override fun onCancelled(@NonNull error: DatabaseError) {
+                Log.e(TAG, "Error al leer datos de humedad del suelo de Firebase: ${error.message}", error.toException())
+                if (isAdded) {
+                    Toast.makeText(requireContext(), "Error de Firebase Humedad Suelo: ${error.message}", Toast.LENGTH_LONG).show()
+                }
+            }
+        })
+    }
+
+    private fun observeViewModel() {
+        sharedSensorViewModel.humidity.observe(viewLifecycleOwner, Observer { humidity ->
+            tvHumedadActualAmbiental.text = "Humedad Ambiental: $humidity%"
+        })
+
+        sharedSensorViewModel.humidityEntries.observe(viewLifecycleOwner, Observer { ambientEntries ->
+            val soilEntries = sharedSensorViewModel.humiditySueloEntries.value ?: emptyList()
+            updateHumidityChart(ambientEntries, soilEntries)
+        })
+
+        sharedSensorViewModel.humiditySuelo.observe(viewLifecycleOwner, Observer { humiditySuelo ->
+            tvHumedadActualSuelo.text = "Humedad del Suelo: $humiditySuelo%"
+        })
+
+        sharedSensorViewModel.humiditySueloEntries.observe(viewLifecycleOwner, Observer { soilEntries ->
+            val ambientEntries = sharedSensorViewModel.humidityEntries.value ?: emptyList()
+            updateHumidityChart(ambientEntries, soilEntries)
+        })
+    }
+
+    private fun setupChart(chart: LineChart) {
+        chart.setTouchEnabled(true)
+        chart.setPinchZoom(true)
+        chart.description.isEnabled = false
+        chart.setNoDataText("Cargando datos de Humedad...")
+        chart.setNoDataTextColor(resources.getColor(android.R.color.darker_gray))
+    }
+
+    private fun updateHumidityChart(ambientEntries: List<Entry>, soilEntries: List<Entry>) {
+        if (ambientEntries.isEmpty() && soilEntries.isEmpty()) {
+            humidityChart.clear()
+            humidityChart.setNoDataText("No hay datos de Humedad disponibles para mostrar.")
+            humidityChart.invalidate()
+            return
+        }
+
+        val dataSets = ArrayList<LineDataSet>()
+
+        if (ambientEntries.isNotEmpty()) {
+            val ambientDataSet = LineDataSet(ambientEntries, "Humedad Ambiental")
+            ambientDataSet.color = resources.getColor(android.R.color.holo_blue_light)
+            ambientDataSet.setCircleColor(resources.getColor(android.R.color.holo_blue_light))
+            ambientDataSet.setDrawValues(false)
+            ambientDataSet.lineWidth = 2f
+            ambientDataSet.circleRadius = 3f
+            dataSets.add(ambientDataSet)
+        }
+
+        if (soilEntries.isNotEmpty()) {
+            val soilDataSet = LineDataSet(soilEntries, "Humedad del Suelo")
+            soilDataSet.color = resources.getColor(android.R.color.holo_green_light)
+            soilDataSet.setCircleColor(resources.getColor(android.R.color.holo_green_light))
+            soilDataSet.setDrawValues(false)
+            soilDataSet.lineWidth = 2f
+            soilDataSet.circleRadius = 3f
+            dataSets.add(soilDataSet)
+        }
+
+        // CORRECCIÓN AQUÍ: Casteo explícito a List<ILineDataSet>
+        val lineData = LineData(dataSets as List<ILineDataSet>)
+        humidityChart.data = lineData
+        humidityChart.invalidate()
+    }
+
+    private fun convertDateToTimestamp(dateString: String): Long {
+        return try {
+            val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault())
+            format.timeZone = TimeZone.getTimeZone("UTC")
+            format.parse(dateString)?.time?.div(1000) ?: -1L
+        } catch (e: Exception) {
+            Log.e(TAG, "Error parsing date string for Humidity: $dateString", e)
+            -1L
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

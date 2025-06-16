@@ -10,43 +10,52 @@ import com.google.firebase.messaging.FirebaseMessaging
 import androidx.appcompat.app.ActionBarDrawerToggle
 import com.google.android.material.navigation.NavigationView
 import androidx.fragment.app.Fragment
-import com.google.firebase.auth.FirebaseAuth // Importa FirebaseAuth
+import androidx.lifecycle.ViewModelProvider
+import com.google.firebase.auth.FirebaseAuth
+import android.util.Log
 
-// Importaciones de tus fragmentos (asegúrate de que estas rutas sean correctas)
+// Importaciones de tus fragmentos
 import com.example.proyectoplata.fragments.HomeFragment
-import com.example.proyectoplata.fragments.TemperatureFragment
+import com.example.proyectoplata.fragments.TemperatureFragment // Mantenemos esta importación por si se usa en otro lugar, pero su case de navegación se eliminará
 import com.example.proyectoplata.fragments.HumidityFragment
 import com.example.proyectoplata.fragments.LightFragment
 import com.example.proyectoplata.fragments.NPKFragment
+import com.example.proyectoplata.fragments.GeminiFragment
 
+// Importación del ViewModel (directamente en el paquete principal)
+import com.example.proyectoplata.SharedSensorViewModel
+import com.example.proyectoplata.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivityMainBinding
     private lateinit var toolbar: Toolbar
     private lateinit var drawerLayout: DrawerLayout
-    private lateinit var auth: FirebaseAuth // Declaración de FirebaseAuth
+    private lateinit var auth: FirebaseAuth
+
+    private lateinit var sharedSensorViewModel: SharedSensorViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        auth = FirebaseAuth.getInstance() // Inicializa FirebaseAuth
+        auth = FirebaseAuth.getInstance()
 
-        // **VERIFICAR SI EL USUARIO ESTÁ LOGEADO AL INICIAR MainActivity**
         if (auth.currentUser == null) {
-            // Si no hay usuario logeado, redirige a LoginActivity
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
-            finish() // Finaliza MainActivity para que el usuario no pueda volver atrás sin logearse
-            return // Sale del onCreate para evitar inicializar el resto de la UI si no hay sesión
+            finish()
+            return
         }
 
-        // Si el usuario está logeado, procede con la inicialización normal de MainActivity
+        sharedSensorViewModel = ViewModelProvider(this).get(SharedSensorViewModel::class.java)
+
         toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        drawerLayout = findViewById(R.id.drawer_layout)
-        val navView: NavigationView = findViewById(R.id.nav_view)
+        drawerLayout = binding.drawerLayout
+        val navView: NavigationView = binding.navView
 
         val toggle = ActionBarDrawerToggle(
             this, drawerLayout, toolbar, R.string.openDrawer, R.string.closeDrawer
@@ -55,53 +64,69 @@ class MainActivity : AppCompatActivity() {
         toggle.syncState()
 
         navView.setNavigationItemSelectedListener { menuItem ->
+            var fragment: Fragment? = null
+            var titleString: String? = null
+
             when (menuItem.itemId) {
                 R.id.nav_home -> {
-                    replaceFragment(HomeFragment())
-                    supportActionBar?.title = "Clima"
+                    fragment = HomeFragment()
+                    titleString = "Clima"
                 }
-                R.id.nav_temperature -> {
-                    replaceFragment(TemperatureFragment())
-                    supportActionBar?.title = "Temperatura"
-                }
+                // ELIMINADO: R.id.nav_temperature -> { fragment = TemperatureFragment(); titleString = "Temperatura" }
                 R.id.nav_humidity -> {
-                    replaceFragment(HumidityFragment())
-                    supportActionBar?.title = "Humedad"
+                    fragment = HumidityFragment()
+                    titleString = "Humedad"
                 }
                 R.id.nav_light -> {
-                    replaceFragment(LightFragment())
-                    supportActionBar?.title = "Luz"
+                    fragment = LightFragment()
+                    titleString = "Luz Solar"
                 }
                 R.id.nav_npk -> {
-                    replaceFragment(NPKFragment())
-                    supportActionBar?.title = "NPK"
+                    fragment = NPKFragment()
+                    titleString = "NPK"
                 }
-                R.id.nav_logout -> { // Opción para cerrar sesión
-                    auth.signOut() // Cierra la sesión de Firebase
+                R.id.nav_gemini_ai -> {
+                    fragment = GeminiFragment()
+                    titleString = "Inteligencia Artificial"
+                }
+                R.id.nav_logout -> {
+                    auth.signOut()
                     Toast.makeText(this, "Sesión cerrada.", Toast.LENGTH_SHORT).show()
                     val intent = Intent(this, LoginActivity::class.java)
                     startActivity(intent)
-                    finish() // Finaliza MainActivity
+                    finish()
                 }
+                // Si la ID del elemento de menú no coincide con ninguna de las opciones anteriores
+                // se mantendrá el fragmento actual o se puede definir un comportamiento por defecto
+                else -> {
+                    Log.w("MainActivity", "Item de menú no reconocido: ${menuItem.itemId}")
+                    // Opcional: podrías mantener el fragmento actual o cargar un fragmento de error/por defecto
+                    // fragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
+                    // titleString = supportActionBar?.title?.toString()
+                }
+            }
+
+            fragment?.let {
+                replaceFragment(it)
+                supportActionBar?.title = titleString
             }
             drawerLayout.closeDrawers()
             true
         }
 
-        // Carga el fragmento inicial si es la primera vez que se crea la actividad
         if (savedInstanceState == null) {
             replaceFragment(HomeFragment())
             supportActionBar?.title = "Clima"
             navView.setCheckedItem(R.id.nav_home)
         }
 
-        // Obtener el token FCM y mostrarlo (puede quedarse aquí o moverse según sea necesario)
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (!task.isSuccessful) {
+                Log.w("MainActivity", "Fetching FCM registration token failed", task.exception)
                 return@addOnCompleteListener
             }
             val token = task.result
-            println("FCM Token: $token")
+            Log.d("MainActivity", "FCM Token: $token")
         }
     }
 

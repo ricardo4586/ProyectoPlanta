@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <!-- Item Home (ya debería existir) -->
+        <item
+            android:id="@+id/nav_home"
+            android:icon="@drawable/ic_menu_home"
+            android:title="@string/menu_home" />
+
+        <!-- ... otros items de menú existentes (déjalos como están) ... -->
+
+        <!-- ¡NUEVO! Item para Inteligencia Artificial -->
+        <item
+            android:id="@+id/nav_gemini_ai"
+            android:icon="@drawable/ic_ai_icon"
+            android:title="Inteligencia Artificial" /> <!-- ASEGÚRATE DE QUE ESTA LÍNEA TERMINE CON "/>" -->
+    </group>
+    <!-- ... otros grupos o items si los tienes (déjalos como están) ... -->
+</menu>
