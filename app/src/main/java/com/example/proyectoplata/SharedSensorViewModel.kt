@@ -5,153 +5,148 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.github.mikephil.charting.data.Entry
 
+/**
+ * SharedSensorViewModel:
+ * Un ViewModel que mantiene los datos de los sensores y los expone a la UI
+ * a través de LiveData. Esto permite que múltiples componentes (fragmentos)
+ * observen los mismos datos y reaccionen a los cambios en tiempo real,
+ * mientras que los datos persisten a través de cambios de configuración (ej. rotación de pantalla).
+ */
 class SharedSensorViewModel : ViewModel() {
 
-    // LiveData para los valores de los sensores individuales (para HomeFragment)
+    // LiveData para los valores actuales de los sensores
     private val _temperature = MutableLiveData<Double>()
-    val temperature: LiveData<Double> = _temperature
+    val temperature: LiveData<Double> get() = _temperature
 
+    // LiveData para la TEMPERATURA DEL SUELO (valor actual)
     private val _temperatureSuelo = MutableLiveData<Double>()
-    val temperatureSuelo: LiveData<Double> = _temperatureSuelo
+    val temperatureSuelo: LiveData<Double> get() = _temperatureSuelo
 
     private val _humidity = MutableLiveData<Double>()
-    val humidity: LiveData<Double> = _humidity
+    val humidity: LiveData<Double> get() = _humidity
 
     private val _humiditySuelo = MutableLiveData<Double>()
-    val humiditySuelo: LiveData<Double> = _humiditySuelo
+    val humiditySuelo: LiveData<Double> get() = _humiditySuelo
 
     private val _uvIndex = MutableLiveData<Double>()
-    val uvIndex: LiveData<Double> = _uvIndex
+    val uvIndex: LiveData<Double> get() = _uvIndex
 
-    private val _light = MutableLiveData<Double>() // Usado para Voltaje UVA
-    val light: LiveData<Double> = _light
-
-    // ELIMINADO: private val _intensidadLuzVisible = MutableLiveData<Double>()
-    // ELIMINADO: val intensidadLuzVisible: LiveData<Double> = _intensidadLuzVisible
-
-    // ELIMINADO: private val _intensidadLuzInfrarroja = MutableLiveData<Double>()
-    // ELIMINADO: val intensidadLuzInfrarroja: LiveData<Double> = _intensidadLuzInfrarroja
+    private val _light = MutableLiveData<Double>() // Usado para voltaje UVA
+    val light: LiveData<Double> get() = _light
 
     private val _nitrogeno = MutableLiveData<Int>()
-    val nitrogeno: LiveData<Int> = _nitrogeno
+    val nitrogeno: LiveData<Int> get() = _nitrogeno
 
     private val _fosforo = MutableLiveData<Int>()
-    val fosforo: LiveData<Int> = _fosforo
+    val fosforo: LiveData<Int> get() = _fosforo
 
     private val _potasio = MutableLiveData<Int>()
-    val potasio: LiveData<Int> = _potasio
+    val potasio: LiveData<Int> get() = _potasio
 
-    // LiveData para los datos de los gráficos (listas de Entry)
-    private val _temperatureEntries = MutableLiveData<ArrayList<Entry>>(ArrayList())
-    val temperatureEntries: LiveData<ArrayList<Entry>> = _temperatureEntries
+    // LiveData para las listas de entradas de gráficos (si usas MPAndroidChart)
+    private val _temperatureEntries = MutableLiveData<ArrayList<Entry>>()
+    val temperatureEntries: LiveData<ArrayList<Entry>> get() = _temperatureEntries
 
-    private val _temperatureSueloEntries = MutableLiveData<ArrayList<Entry>>(ArrayList())
-    val temperatureSueloEntries: LiveData<ArrayList<Entry>> = _temperatureSueloEntries
+    // LiveData para las ENTRADAS DE TEMPERATURA DEL SUELO (para el gráfico)
+    private val _temperatureSueloEntries = MutableLiveData<ArrayList<Entry>>()
+    val temperatureSueloEntries: LiveData<ArrayList<Entry>> get() = _temperatureSueloEntries
 
-    private val _humidityEntries = MutableLiveData<ArrayList<Entry>>(ArrayList())
-    val humidityEntries: LiveData<ArrayList<Entry>> = _humidityEntries
+    private val _humidityEntries = MutableLiveData<ArrayList<Entry>>()
+    val humidityEntries: LiveData<ArrayList<Entry>> get() = _humidityEntries
 
-    private val _humiditySueloEntries = MutableLiveData<ArrayList<Entry>>(ArrayList())
-    val humiditySueloEntries: LiveData<ArrayList<Entry>> = _humiditySueloEntries
+    private val _humiditySueloEntries = MutableLiveData<ArrayList<Entry>>()
+    val humiditySueloEntries: LiveData<ArrayList<Entry>> get() = _humiditySueloEntries
 
-    private val _uvIndexEntries = MutableLiveData<ArrayList<Entry>>(ArrayList())
-    val uvIndexEntries: LiveData<ArrayList<Entry>> = _uvIndexEntries
+    private val _uvIndexEntries = MutableLiveData<ArrayList<Entry>>()
+    val uvIndexEntries: LiveData<ArrayList<Entry>> get() = _uvIndexEntries
 
-    private val _lightEntries = MutableLiveData<ArrayList<Entry>>(ArrayList()) // Usado para Voltaje UVA
-    val lightEntries: LiveData<ArrayList<Entry>> = _lightEntries
+    private val _lightEntries = MutableLiveData<ArrayList<Entry>>()
+    val lightEntries: LiveData<ArrayList<Entry>> get() = _lightEntries
 
-    // ELIMINADO: private val _intensidadLuzVisibleEntries = MutableLiveData<ArrayList<Entry>>(ArrayList())
-    // ELIMINADO: val intensidadLuzVisibleEntries: LiveData<ArrayList<Entry>> = _intensidadLuzVisibleEntries
+    private val _nitrogenoEntries = MutableLiveData<ArrayList<Entry>>()
+    val nitrogenoEntries: LiveData<ArrayList<Entry>> get() = _nitrogenoEntries
 
-    // ELIMINADO: private val _intensidadLuzInfrarrojaEntries = MutableLiveData<ArrayList<Entry>>(ArrayList())
-    // ELIMINADO: val intensidadLuzInfrarrojaEntries: LiveData<ArrayList<Entry>> = _intensidadLuzInfrarrojaEntries
+    private val _fosforoEntries = MutableLiveData<ArrayList<Entry>>()
+    val fosforoEntries: LiveData<ArrayList<Entry>> get() = _fosforoEntries
 
-    private val _nitrogenoEntries = MutableLiveData<ArrayList<Entry>>(ArrayList())
-    val nitrogenoEntries: LiveData<ArrayList<Entry>> = _nitrogenoEntries
+    private val _potasioEntries = MutableLiveData<ArrayList<Entry>>()
+    val potasioEntries: LiveData<ArrayList<Entry>> get() = _potasioEntries
 
-    private val _fosforoEntries = MutableLiveData<ArrayList<Entry>>(ArrayList())
-    val fosforoEntries: LiveData<ArrayList<Entry>> = _fosforoEntries
+    // --- Métodos para actualizar los datos actuales ---
 
-    private val _potasioEntries = MutableLiveData<ArrayList<Entry>>(ArrayList())
-    val potasioEntries: LiveData<ArrayList<Entry>> = _potasioEntries
-
-    // Funciones para actualizar los valores de los sensores individuales
-    fun updateTemperature(newTemperature: Double) {
-        _temperature.value = newTemperature
+    fun updateTemperature(temp: Double) {
+        _temperature.value = temp
     }
 
-    fun updateTemperatureSuelo(newTemperatureSuelo: Double) {
-        _temperatureSuelo.value = newTemperatureSuelo
+    // Función para actualizar la TEMPERATURA DEL SUELO
+    fun updateTemperatureSuelo(tempSuelo: Double) {
+        _temperatureSuelo.value = tempSuelo
     }
 
-    fun updateHumidity(newHumidity: Double) {
-        _humidity.value = newHumidity
+    fun updateHumidity(hum: Double) {
+        _humidity.value = hum
     }
 
-    fun updateHumiditySuelo(newHumiditySuelo: Double) {
-        _humiditySuelo.value = newHumiditySuelo
+    fun updateHumiditySuelo(humSuelo: Double) {
+        _humiditySuelo.value = humSuelo
     }
 
-    fun updateUvIndex(newUvIndex: Double) {
-        _uvIndex.value = newUvIndex
+    fun updateUvIndex(uv: Double) {
+        _uvIndex.value = uv
     }
 
-    fun updateLight(newLight: Double) { // Usado para Voltaje UVA
-        _light.value = newLight
+    fun updateLight(lightVal: Double) {
+        _light.value = lightVal
     }
 
-    // ELIMINADO: fun updateIntensidadLuzVisible(newIntensidadLuzVisible: Double) { ... }
-    // ELIMINADO: fun updateIntensidadLuzInfrarroja(newIntensidadLuzInfrarroja: Double) { ... }
-
-    fun updateNitrogeno(newNitrogeno: Int) {
-        _nitrogeno.value = newNitrogeno
+    fun updateNitrogeno(nitro: Int) {
+        _nitrogeno.value = nitro
     }
 
-    fun updateFosforo(newFosforo: Int) {
-        _fosforo.value = newFosforo
+    fun updateFosforo(phos: Int) {
+        _fosforo.value = phos
     }
 
-    fun updatePotasio(newPotasio: Int) {
-        _potasio.value = newPotasio
+    fun updatePotasio(pot: Int) {
+        _potasio.value = pot
     }
 
-    // Funciones para actualizar las listas de Entries para los gráficos
-    fun updateTemperatureEntries(newEntries: ArrayList<Entry>) {
-        _temperatureEntries.value = newEntries
+    // --- Métodos para actualizar las listas de Entries para gráficos ---
+
+    fun updateTemperatureEntries(entries: ArrayList<Entry>) {
+        _temperatureEntries.value = entries
     }
 
-    fun updateTemperatureSueloEntries(newEntries: ArrayList<Entry>) {
-        _temperatureSueloEntries.value = newEntries
+    // Función para actualizar las ENTRADAS DE TEMPERATURA DEL SUELO
+    fun updateTemperatureSueloEntries(entries: ArrayList<Entry>) {
+        _temperatureSueloEntries.value = entries
     }
 
-    fun updateHumidityEntries(newEntries: ArrayList<Entry>) {
-        _humidityEntries.value = newEntries
+    fun updateHumidityEntries(entries: ArrayList<Entry>) {
+        _humidityEntries.value = entries
     }
 
-    fun updateHumiditySueloEntries(newEntries: ArrayList<Entry>) {
-        _humiditySueloEntries.value = newEntries
+    fun updateHumiditySueloEntries(entries: ArrayList<Entry>) {
+        _humiditySueloEntries.value = entries
     }
 
-    fun updateUvIndexEntries(newEntries: ArrayList<Entry>) {
-        _uvIndexEntries.value = newEntries
+    fun updateUvIndexEntries(entries: ArrayList<Entry>) {
+        _uvIndexEntries.value = entries
     }
 
-    fun updateLightEntries(newEntries: ArrayList<Entry>) {
-        _lightEntries.value = newEntries
+    fun updateLightEntries(entries: ArrayList<Entry>) {
+        _lightEntries.value = entries
     }
 
-    // ELIMINADO: fun updateIntensidadLuzVisibleEntries(newEntries: ArrayList<Entry>) { ... }
-    // ELIMINADO: fun updateIntensidadLuzInfrarrojaEntries(newEntries: ArrayList<Entry>) { ... }
-
-    fun updateNitrogenoEntries(newEntries: ArrayList<Entry>) {
-        _nitrogenoEntries.value = newEntries
+    fun updateNitrogenoEntries(entries: ArrayList<Entry>) {
+        _nitrogenoEntries.value = entries
     }
 
-    fun updateFosforoEntries(newEntries: ArrayList<Entry>) {
-        _fosforoEntries.value = newEntries
+    fun updateFosforoEntries(entries: ArrayList<Entry>) {
+        _fosforoEntries.value = entries
     }
 
-    fun updatePotasioEntries(newEntries: ArrayList<Entry>) {
-        _potasioEntries.value = newEntries
+    fun updatePotasioEntries(entries: ArrayList<Entry>) {
+        _potasioEntries.value = entries
     }
 }

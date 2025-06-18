@@ -35,6 +35,7 @@ class GeminiFragment : Fragment() {
 
     private var currentHumedadAmbiental: Double = -1.0
     private var currentHumedadSuelo: Double = -1.0
+    private var currentTemperaturaAmbiental: Double = -1.0 // Reincorporada
     private var currentIndiceUv: Double = -1.0
     private var currentVoltajeUva: Double = -1.0
     private var currentNitrogeno: Int = -1
@@ -100,6 +101,13 @@ class GeminiFragment : Fragment() {
 
     private fun observeSensorData() {
         Log.d(TAG, "observeSensorData: Configurando observadores para datos de sensores.")
+        sharedSensorViewModel.temperature.observe(viewLifecycleOwner) { temp -> // Observando temperatura ambiental
+            if (currentTemperaturaAmbiental != temp) {
+                currentTemperaturaAmbiental = temp
+                Log.d(TAG, "Observed: Temp Amb = $currentTemperaturaAmbiental. Attempting Gemini Rec.")
+                attemptGeminiRecommendation()
+            }
+        }
         sharedSensorViewModel.humidity.observe(viewLifecycleOwner) { hum ->
             if (currentHumedadAmbiental != hum) {
                 currentHumedadAmbiental = hum
@@ -157,11 +165,12 @@ class GeminiFragment : Fragment() {
      */
     private fun attemptGeminiRecommendation() {
         Log.d(TAG, "attemptGeminiRecommendation: Iniciando verificación de datos para recomendación automática.")
-        // Mostrar solo los valores de los sensores que realmente se esperan y están siendo observados.
-        Log.d(TAG, "Valores de sensores actuales en GeminiFragment: HumAmb=$currentHumedadAmbiental, HumSuelo=$currentHumedadSuelo, UV=$currentIndiceUv, UVA=$currentVoltajeUva, NPK_N=$currentNitrogeno, NPK_P=$currentFosforo, NPK_K=$currentPotasio")
+        // Mostrar todos los valores de los sensores que realmente se esperan y están siendo observados.
+        Log.d(TAG, "Valores de sensores actuales en GeminiFragment: TempAmb=$currentTemperaturaAmbiental, HumAmb=$currentHumedadAmbiental, HumSuelo=$currentHumedadSuelo, UV=$currentIndiceUv, UVA=$currentVoltajeUva, NPK_N=$currentNitrogeno, NPK_P=$currentFosforo, NPK_K=$currentPotasio")
 
 
         if (::generativeModel.isInitialized &&
+            currentTemperaturaAmbiental != -1.0 && // Reincorporada esta condición
             currentHumedadAmbiental != -1.0 &&
             currentHumedadSuelo != -1.0 &&
             currentIndiceUv != -1.0 &&
@@ -174,7 +183,8 @@ class GeminiFragment : Fragment() {
             Log.d(TAG, "attemptGeminiRecommendation: ¡Todos los datos de sensores DISPONIBLES son válidos y Gemini está listo! Generando recomendación.")
             val autoPrompt = createGeminiPrompt(
                 // Instrucción modificada: Más concisa y fácil de entender
-                "Genera una recomendación para el cultivo de papas. Analiza los datos de los sensores (humedad ambiental, humedad del suelo, índice UV, voltaje UVA, nitrógeno, fósforo, potasio) y, con tu conocimiento general, da consejos sobre riego, luz y nutrientes. Usa palabras claras y precisas, evitando lenguaje técnico. Si algún dato es 'N/D', explica brevemente su impacto y qué hacer.",
+                "Genera una recomendación para el cultivo de papas. Analiza los datos de los sensores (temperatura ambiental, humedad ambiental, humedad del suelo, índice UV, voltaje UVA, nitrógeno, fósforo, potasio) y, con tu conocimiento general, da consejos sobre riego, luz y nutrientes. Usa palabras claras y precisas, evitando lenguaje técnico. Si algún dato es 'N/D', explica brevemente su impacto y qué hacer.",
+                currentTemperaturaAmbiental.toFloat(), // Se envía
                 currentHumedadAmbiental.toFloat(),
                 currentHumedadSuelo.toFloat(),
                 currentIndiceUv.toFloat(),
@@ -205,10 +215,11 @@ class GeminiFragment : Fragment() {
      */
     private fun createGeminiPrompt(
         userQuestion: String,
-        humAmb: Float, humSuelo: Float, uvIndex: Float, voltajeUva: Float,
+        tempAmb: Float, humAmb: Float, humSuelo: Float, uvIndex: Float, voltajeUva: Float,
         nitrogeno: Int, fosforo: Int, potasio: Int
     ): String {
         // Formatea los valores de los sensores a cadenas legibles, o "N/D" si no están disponibles.
+        val tempAmbStr = if (tempAmb != -1f) "$tempAmb°C" else "N/D" // Reincorporado
         val humAmbStr = if (humAmb != -1f) "$humAmb%" else "N/D"
         val humSueloStr = if (humSuelo != -1f) "$humSuelo%" else "N/D"
         val uvIndexStr = if (uvIndex != -1f) "$uvIndex" else "N/D"
@@ -220,6 +231,7 @@ class GeminiFragment : Fragment() {
         // Construye el prompt completo para Gemini.
         return """
         Aquí están los últimos datos de los sensores de una planta:
+        - Temperatura Ambiental: $tempAmbStr
         - Humedad Ambiental: $humAmbStr
         - Humedad del Suelo: $humSueloStr
         - Índice UV: $uvIndexStr
@@ -256,6 +268,7 @@ class GeminiFragment : Fragment() {
         // Construye el prompt combinado con la pregunta del usuario y los datos de los sensores.
         val combinedPrompt = createGeminiPrompt(
             contextualUserQuery, // Usamos la pregunta contextualizada
+            currentTemperaturaAmbiental.toFloat(), // Se envía
             currentHumedadAmbiental.toFloat(),
             currentHumedadSuelo.toFloat(),
             currentIndiceUv.toFloat(),

@@ -2,37 +2,35 @@ package com.example.proyectoplata
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
-import androidx.drawerlayout.widget.DrawerLayout
-import com.google.firebase.messaging.FirebaseMessaging
 import androidx.appcompat.app.ActionBarDrawerToggle
-import com.google.android.material.navigation.NavigationView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.example.proyectoplata.databinding.ActivityMainBinding
 import com.google.firebase.auth.FirebaseAuth
-import android.util.Log
+import com.google.firebase.messaging.FirebaseMessaging
 
 // Importaciones de tus fragmentos
 import com.example.proyectoplata.fragments.HomeFragment
-import com.example.proyectoplata.fragments.TemperatureFragment // Mantenemos esta importación por si se usa en otro lugar, pero su case de navegación se eliminará
+import com.example.proyectoplata.fragments.TemperatureFragment // Este es para Temperatura Ambiental
 import com.example.proyectoplata.fragments.HumidityFragment
+import com.example.proyectoplata.fragments.HumiditySoilFragment
+import com.example.proyectoplata.fragments.UvIndexFragment
 import com.example.proyectoplata.fragments.LightFragment
-import com.example.proyectoplata.fragments.NPKFragment
+import com.example.proyectoplata.fragments.NitrogenFragment
+import com.example.proyectoplata.fragments.PhosphorusFragment
+import com.example.proyectoplata.fragments.PotassiumFragment
 import com.example.proyectoplata.fragments.GeminiFragment
+// La línea para TemperatureSoilFragment ha sido eliminada o comentada.
+// Ejemplo: // import com.example.proyectoplata.fragments.TemperatureSoilFragment
 
-// Importación del ViewModel (directamente en el paquete principal)
-import com.example.proyectoplata.SharedSensorViewModel
-import com.example.proyectoplata.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private lateinit var toolbar: Toolbar
-    private lateinit var drawerLayout: DrawerLayout
     private lateinit var auth: FirebaseAuth
-
     private lateinit var sharedSensorViewModel: SharedSensorViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,48 +40,71 @@ class MainActivity : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
 
+        // Redirige al usuario a la pantalla de inicio de sesión si no está autenticado
         if (auth.currentUser == null) {
-            val intent = Intent(this, LoginActivity::class.java)
-            startActivity(intent)
-            finish()
+            navigateToLogin()
             return
         }
 
-        sharedSensorViewModel = ViewModelProvider(this).get(SharedSensorViewModel::class.java)
+        // Inicializa el ViewModel compartido para la comunicación de datos entre fragmentos
+        sharedSensorViewModel = ViewModelProvider(this)[SharedSensorViewModel::class.java]
 
-        toolbar = findViewById(R.id.toolbar)
-        setSupportActionBar(toolbar)
+        // Configura la barra de herramientas como la barra de acción de la actividad
+        setSupportActionBar(binding.toolbar)
 
-        drawerLayout = binding.drawerLayout
-        val navView: NavigationView = binding.navView
-
+        // Configura el botón de alternancia del cajón de navegación (icono de hamburguesa)
         val toggle = ActionBarDrawerToggle(
-            this, drawerLayout, toolbar, R.string.openDrawer, R.string.closeDrawer
+            this,
+            binding.drawerLayout,
+            binding.toolbar,
+            R.string.openDrawer,
+            R.string.closeDrawer
         )
-        drawerLayout.addDrawerListener(toggle)
+        binding.drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
 
-        navView.setNavigationItemSelectedListener { menuItem ->
+        // Configura el listener para los elementos seleccionados en el menú de navegación
+        binding.navView.setNavigationItemSelectedListener { menuItem ->
             var fragment: Fragment? = null
             var titleString: String? = null
 
             when (menuItem.itemId) {
                 R.id.nav_home -> {
                     fragment = HomeFragment()
-                    titleString = "Clima"
+                    titleString = "Clima y Sensores"
                 }
-                // ELIMINADO: R.id.nav_temperature -> { fragment = TemperatureFragment(); titleString = "Temperatura" }
+                // Usa el nuevo ID del menú: nav_temperature_ambient
+                R.id.nav_temperature_ambient -> { // Coincide con el nuevo ID en menu_sensores.xml
+                    fragment = TemperatureFragment() // Este es el fragmento que ya hemos corregido para Temperatura Ambiental
+                    titleString = "Gráfico Temperatura Ambiental"
+                }
                 R.id.nav_humidity -> {
                     fragment = HumidityFragment()
-                    titleString = "Humedad"
+                    titleString = "Gráfico Humedad Ambiental"
                 }
-                R.id.nav_light -> {
+                R.id.nav_humidity_soil -> {
+                    fragment = HumiditySoilFragment()
+                    titleString = "Gráfico Humedad del Suelo"
+                }
+                R.id.nav_uv_index -> {
+                    fragment = UvIndexFragment()
+                    titleString = "Gráfico Índice UV"
+                }
+                R.id.nav_voltage_uva -> {
                     fragment = LightFragment()
-                    titleString = "Luz Solar"
+                    titleString = "Gráfico Voltaje UVA"
                 }
-                R.id.nav_npk -> {
-                    fragment = NPKFragment()
-                    titleString = "NPK"
+                R.id.nav_nitrogen -> {
+                    fragment = NitrogenFragment()
+                    titleString = "Gráfico Nitrógeno (N)"
+                }
+                R.id.nav_phosphorus -> {
+                    fragment = PhosphorusFragment()
+                    titleString = "Gráfico Fósforo (P)"
+                }
+                R.id.nav_potassium -> {
+                    fragment = PotassiumFragment()
+                    titleString = "Gráfico Potasio (K)"
                 }
                 R.id.nav_gemini_ai -> {
                     fragment = GeminiFragment()
@@ -92,17 +113,10 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_logout -> {
                     auth.signOut()
                     Toast.makeText(this, "Sesión cerrada.", Toast.LENGTH_SHORT).show()
-                    val intent = Intent(this, LoginActivity::class.java)
-                    startActivity(intent)
-                    finish()
+                    navigateToLogin()
                 }
-                // Si la ID del elemento de menú no coincide con ninguna de las opciones anteriores
-                // se mantendrá el fragmento actual o se puede definir un comportamiento por defecto
                 else -> {
-                    Log.w("MainActivity", "Item de menú no reconocido: ${menuItem.itemId}")
-                    // Opcional: podrías mantener el fragmento actual o cargar un fragmento de error/por defecto
-                    // fragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
-                    // titleString = supportActionBar?.title?.toString()
+                    Log.w("MainActivity", "Elemento de menú no reconocido: ${menuItem.itemId}")
                 }
             }
 
@@ -110,19 +124,22 @@ class MainActivity : AppCompatActivity() {
                 replaceFragment(it)
                 supportActionBar?.title = titleString
             }
-            drawerLayout.closeDrawers()
+            binding.drawerLayout.closeDrawers()
             true
         }
 
+        // Carga el HomeFragment al inicio de la actividad si no hay estado de instancia guardado
         if (savedInstanceState == null) {
             replaceFragment(HomeFragment())
-            supportActionBar?.title = "Clima"
-            navView.setCheckedItem(R.id.nav_home)
+            supportActionBar?.title = "Clima y Sensores"
+            // Selecciona visualmente el elemento "Home" al inicio
+            binding.navView.setCheckedItem(R.id.nav_home)
         }
 
+        // Obtiene y registra el token de FCM (para notificaciones push)
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (!task.isSuccessful) {
-                Log.w("MainActivity", "Fetching FCM registration token failed", task.exception)
+                Log.w("MainActivity", "Fallo al obtener el token de registro de FCM", task.exception)
                 return@addOnCompleteListener
             }
             val token = task.result
@@ -130,9 +147,17 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Función auxiliar para reemplazar el fragmento actual en el contenedor principal
     private fun replaceFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, fragment)
+            .replace(R.id.content_frame, fragment)
             .commit()
+    }
+
+    // Función auxiliar para navegar a LoginActivity y finalizar la actividad actual
+    private fun navigateToLogin() {
+        val intent = Intent(this, LoginActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 }

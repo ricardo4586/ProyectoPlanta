@@ -6,29 +6,62 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_home"
-            android:title="Clima" />
-        <!-- CATEGORÍA TEMPERATURA ELIMINADA -->
-        <item
-            android:id="@+id/nav_humidity"
-            android:title="Humedad" />
-        <item
-            android:id="@+id/nav_light"
-            android:title="Luz" />
-        <item
-            android:id="@+id/nav_npk"
-            android:title="NPK" />
+            android:title="Clima y Sensores (Actual)" />
+
+        <item android:title="Temperatura">
+            <menu>
+                <item
+                    android:id="@+id/nav_temperature_ambient"
+                    android:title="Temperatura Ambiental" />
+            </menu>
+        </item>
+
+        <item android:title="Humedad">
+            <menu>
+                <item
+                    android:id="@+id/nav_humidity"
+                    android:title="Humedad Ambiental" />
+                <item
+                    android:id="@+id/nav_humidity_soil"
+                    android:title="Humedad del Suelo" />
+            </menu>
+        </item>
+
+        <item android:title="Luz">
+            <menu>
+                <item
+                    android:id="@+id/nav_uv_index"
+                    android:title="Índice UV" />
+                <item
+                    android:id="@+id/nav_voltage_uva"
+                    android:title="Voltaje UVA" />
+            </menu>
+        </item>
+
+        <item android:title="NPK">
+            <menu>
+                <item
+                    android:id="@+id/nav_nitrogen"
+                    android:title="Nitrógeno (N)" />
+                <item
+                    android:id="@+id/nav_phosphorus"  android:title="Fósforo (P)" />
+                <item
+                    android:id="@+id/nav_potassium"
+                    android:title="Potasio (K)" />
+            </menu>
+        </item>
 
         <item
             android:id="@+id/nav_gemini_ai"
             android:title="Inteligencia Artificial" />
-
     </group>
 
-    <item android:title="Cuenta">
+    <item android:title="Gestión">
         <menu>
             <item
                 android:id="@+id/nav_logout"
                 android:title="Cerrar Sesión" />
         </menu>
     </item>
+
 </menu>
