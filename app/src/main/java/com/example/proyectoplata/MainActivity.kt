@@ -10,11 +10,27 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.proyectoplata.databinding.ActivityMainBinding
 import com.google.firebase.auth.FirebaseAuth
+
+// Importaciones de Firebase para la base de datos y mensajes
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.messaging.FirebaseMessaging
 
-// Importaciones de tus fragmentos
+// Importación para MPAndroidChart
+import com.github.mikephil.charting.data.Entry
+
+// Importaciones para formato de fecha/hora
+import java.text.SimpleDateFormat
+import java.util.*
+
+// *** IMPORTACIÓN CRUCIAL PARA SharedSensorViewModel ***
+import com.example.proyectoplata.SharedSensorViewModel
+
+// Importaciones de tus fragmentos (asegúrate de que estas rutas sean correctas)
 import com.example.proyectoplata.fragments.HomeFragment
-import com.example.proyectoplata.fragments.TemperatureFragment // Este es para Temperatura Ambiental
+import com.example.proyectoplata.fragments.TemperatureFragment
 import com.example.proyectoplata.fragments.HumidityFragment
 import com.example.proyectoplata.fragments.HumiditySoilFragment
 import com.example.proyectoplata.fragments.UvIndexFragment
@@ -23,15 +39,15 @@ import com.example.proyectoplata.fragments.NitrogenFragment
 import com.example.proyectoplata.fragments.PhosphorusFragment
 import com.example.proyectoplata.fragments.PotassiumFragment
 import com.example.proyectoplata.fragments.GeminiFragment
-// La línea para TemperatureSoilFragment ha sido eliminada o comentada.
-// Ejemplo: // import com.example.proyectoplata.fragments.TemperatureSoilFragment
 
 
 class MainActivity : AppCompatActivity() {
 
+    private val TAG = "MainActivity" // Para los logs
     private lateinit var binding: ActivityMainBinding
     private lateinit var auth: FirebaseAuth
     private lateinit var sharedSensorViewModel: SharedSensorViewModel
+    private lateinit var firebaseDatabase: FirebaseDatabase // Declaración de la instancia de FirebaseDatabase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,6 +55,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         auth = FirebaseAuth.getInstance()
+        firebaseDatabase = FirebaseDatabase.getInstance() // Inicialización de FirebaseDatabase
 
         // Redirige al usuario a la pantalla de inicio de sesión si no está autenticado
         if (auth.currentUser == null) {
@@ -48,6 +65,10 @@ class MainActivity : AppCompatActivity() {
 
         // Inicializa el ViewModel compartido para la comunicación de datos entre fragmentos
         sharedSensorViewModel = ViewModelProvider(this)[SharedSensorViewModel::class.java]
+
+        // Llamada a la función para leer datos de temperatura ambiental de Firebase
+        setupTemperatureAmbientalFirebaseListener()
+
 
         // Configura la barra de herramientas como la barra de acción de la actividad
         setSupportActionBar(binding.toolbar)
@@ -73,9 +94,8 @@ class MainActivity : AppCompatActivity() {
                     fragment = HomeFragment()
                     titleString = "Clima y Sensores"
                 }
-                // Usa el nuevo ID del menú: nav_temperature_ambient
-                R.id.nav_temperature_ambient -> { // Coincide con el nuevo ID en menu_sensores.xml
-                    fragment = TemperatureFragment() // Este es el fragmento que ya hemos corregido para Temperatura Ambiental
+                R.id.nav_temperature_ambient -> {
+                    fragment = TemperatureFragment()
                     titleString = "Gráfico Temperatura Ambiental"
                 }
                 R.id.nav_humidity -> {
@@ -116,7 +136,7 @@ class MainActivity : AppCompatActivity() {
                     navigateToLogin()
                 }
                 else -> {
-                    Log.w("MainActivity", "Elemento de menú no reconocido: ${menuItem.itemId}")
+                    Log.w(TAG, "Elemento de menú no reconocido: ${menuItem.itemId}")
                 }
             }
 
@@ -139,12 +159,45 @@ class MainActivity : AppCompatActivity() {
         // Obtiene y registra el token de FCM (para notificaciones push)
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (!task.isSuccessful) {
-                Log.w("MainActivity", "Fallo al obtener el token de registro de FCM", task.exception)
+                Log.w(TAG, "Fallo al obtener el token de registro de FCM", task.exception)
                 return@addOnCompleteListener
             }
             val token = task.result
-            Log.d("MainActivity", "FCM Token: $token")
+            Log.d(TAG, "FCM Token: $token")
         }
+    }
+
+    // Función para leer datos de temperatura ambiental de Firebase
+    private fun setupTemperatureAmbientalFirebaseListener() {
+        val ref = firebaseDatabase.getReference("mediciones/temperatura_ambiental")
+        ref.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val entries = ArrayList<Entry>()
+                for (childSnapshot in snapshot.children) {
+                    val key = childSnapshot.key // Por ejemplo: "YYYY-MM-DD_HH-mm-ss"
+                    val value = childSnapshot.getValue(Float::class.java)
+
+                    if (key != null && value != null) {
+                        try {
+                            val dateFormat = SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.getDefault())
+                            val date = dateFormat.parse(key)
+                            if (date != null) {
+                                entries.add(Entry(date.time.toFloat(), value)) // x: timestamp, y: value
+                            }
+                        } catch (e: Exception) {
+                            Log.e(TAG, "Error al parsear fecha para temperatura ambiental: ${e.message}")
+                        }
+                    }
+                }
+                entries.sortBy { it.x } // Asegurarse de que los datos estén ordenados por tiempo
+                sharedSensorViewModel.updateTemperatureEntries(entries) // Envía los datos a tu ViewModel
+                Log.d(TAG, "Datos de temperatura ambiental de Firebase procesados: ${entries.size} entradas.")
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e(TAG, "Error al leer datos de temperatura ambiental de Firebase: ${error.message}")
+            }
+        })
     }
 
     // Función auxiliar para reemplazar el fragmento actual en el contenedor principal

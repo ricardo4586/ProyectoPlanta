@@ -1,4 +1,4 @@
-package com.example.proyectoplata
+package com.example.proyectoplata // ¡MUY IMPORTANTE! Esta debe ser la primera línea.
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -11,6 +11,8 @@ import com.github.mikephil.charting.data.Entry
  * a través de LiveData. Esto permite que múltiples componentes (fragmentos)
  * observen los mismos datos y reaccionen a los cambios en tiempo real,
  * mientras que los datos persisten a través de cambios de configuración (ej. rotación de pantalla).
+ * Este ViewModel es "tonto" y no contiene lógica de acceso a la base de datos (Firebase).
+ * Los datos deben ser actualizados por un componente externo (ej. MainActivity).
  */
 class SharedSensorViewModel : ViewModel() {
 
@@ -43,11 +45,11 @@ class SharedSensorViewModel : ViewModel() {
     private val _potasio = MutableLiveData<Int>()
     val potasio: LiveData<Int> get() = _potasio
 
-    // LiveData para las listas de entradas de gráficos (si usas MPAndroidChart)
+    // LiveData para las listas de entradas de gráficos (MPAndroidChart)
+    // Estas son las LiveData que tus fragmentos de gráfico deben observar.
     private val _temperatureEntries = MutableLiveData<ArrayList<Entry>>()
     val temperatureEntries: LiveData<ArrayList<Entry>> get() = _temperatureEntries
 
-    // LiveData para las ENTRADAS DE TEMPERATURA DEL SUELO (para el gráfico)
     private val _temperatureSueloEntries = MutableLiveData<ArrayList<Entry>>()
     val temperatureSueloEntries: LiveData<ArrayList<Entry>> get() = _temperatureSueloEntries
 
@@ -72,13 +74,12 @@ class SharedSensorViewModel : ViewModel() {
     private val _potasioEntries = MutableLiveData<ArrayList<Entry>>()
     val potasioEntries: LiveData<ArrayList<Entry>> get() = _potasioEntries
 
-    // --- Métodos para actualizar los datos actuales ---
+    // --- Métodos para actualizar los datos actuales (llamados desde MainActivity o similar) ---
 
     fun updateTemperature(temp: Double) {
         _temperature.value = temp
     }
 
-    // Función para actualizar la TEMPERATURA DEL SUELO
     fun updateTemperatureSuelo(tempSuelo: Double) {
         _temperatureSuelo.value = tempSuelo
     }
@@ -111,13 +112,12 @@ class SharedSensorViewModel : ViewModel() {
         _potasio.value = pot
     }
 
-    // --- Métodos para actualizar las listas de Entries para gráficos ---
+    // --- Métodos para actualizar las listas de Entries para gráficos (llamados desde MainActivity o similar) ---
 
     fun updateTemperatureEntries(entries: ArrayList<Entry>) {
         _temperatureEntries.value = entries
     }
 
-    // Función para actualizar las ENTRADAS DE TEMPERATURA DEL SUELO
     fun updateTemperatureSueloEntries(entries: ArrayList<Entry>) {
         _temperatureSueloEntries.value = entries
     }
