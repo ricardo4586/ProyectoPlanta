@@ -106,6 +106,9 @@ class MainActivity : AppCompatActivity(), com.google.android.material.navigation
             }
             val token = task.result
             Log.d(TAG, "FCM Token: $token")
+
+            // *** AÑADIDO: Guardar el token en Firebase Realtime Database ***
+            saveFCMTokenToDatabase(token)
         }
     }
 
@@ -225,5 +228,32 @@ class MainActivity : AppCompatActivity(), com.google.android.material.navigation
         val intent = Intent(this, LoginActivity::class.java)
         startActivity(intent)
         finish()
+    }
+
+    // *** NUEVA FUNCIÓN PARA GUARDAR EL TOKEN FCM EN LA BASE DE DATOS ***
+    private fun saveFCMTokenToDatabase(token: String?) {
+        val userId = auth.currentUser?.uid // Obtén el ID del usuario actual si está logueado
+        if (userId != null && token != null) {
+            val database = FirebaseDatabase.getInstance()
+            // Guarda el token bajo el nodo de usuario (ej. /users/<userId>/fcmToken)
+            // Esto es CRUCIAL para que tu backend sepa a dónde enviar las notificaciones.
+            // Puedes adaptar esta ruta a tu estructura de datos específica.
+            database.getReference("users").child(userId).child("fcmToken").setValue(token)
+                .addOnSuccessListener {
+                    Log.d(TAG, "FCM token saved to database for user: $userId")
+                }
+                .addOnFailureListener { e ->
+                    Log.e(TAG, "Failed to save FCM token to database for user: $userId", e)
+                }
+        } else if (token != null) {
+            // Si no hay un usuario autenticado (ej. usuario anónimo), puedes guardar el token bajo un nodo general
+            // o usar un ID de dispositivo único si lo generas en otra parte.
+            // Asegúrate de que tu backend tenga una forma de asociar estos tokens a los datos del sensor.
+            Log.d(TAG, "No user logged in. FCM token obtained: $token. Cannot save to specific user.")
+            // Opcional: Podrías guardar tokens no asociados a usuarios en un nodo diferente si es necesario
+            // firebaseDatabase.getReference("anonymousFcmTokens").child(token).setValue(true)
+        } else {
+            Log.d(TAG, "FCM token is null, cannot save.")
+        }
     }
 }
