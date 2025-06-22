@@ -3,9 +3,11 @@ package com.example.proyectoplata
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.MenuItem // Necesario para onNavigationItemSelected
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.GravityCompat // Necesario para closeDrawers
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.proyectoplata.databinding.ActivityMainBinding
@@ -39,9 +41,10 @@ import com.example.proyectoplata.fragments.NitrogenFragment
 import com.example.proyectoplata.fragments.PhosphorusFragment
 import com.example.proyectoplata.fragments.PotassiumFragment
 import com.example.proyectoplata.fragments.GeminiFragment
+import com.example.proyectoplata.fragments.CropRecommendationFragment // Importación añadida para CropRecommendationFragment
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), com.google.android.material.navigation.NavigationView.OnNavigationItemSelectedListener { // Implementar la interfaz
 
     private val TAG = "MainActivity" // Para los logs
     private lateinit var binding: ActivityMainBinding
@@ -85,68 +88,7 @@ class MainActivity : AppCompatActivity() {
         toggle.syncState()
 
         // Configura el listener para los elementos seleccionados en el menú de navegación
-        binding.navView.setNavigationItemSelectedListener { menuItem ->
-            var fragment: Fragment? = null
-            var titleString: String? = null
-
-            when (menuItem.itemId) {
-                R.id.nav_home -> {
-                    fragment = HomeFragment()
-                    titleString = "Clima y Sensores"
-                }
-                R.id.nav_temperature_ambient -> {
-                    fragment = TemperatureFragment()
-                    titleString = "Gráfico Temperatura Ambiental"
-                }
-                R.id.nav_humidity -> {
-                    fragment = HumidityFragment()
-                    titleString = "Gráfico Humedad Ambiental"
-                }
-                R.id.nav_humidity_soil -> {
-                    fragment = HumiditySoilFragment()
-                    titleString = "Gráfico Humedad del Suelo"
-                }
-                R.id.nav_uv_index -> {
-                    fragment = UvIndexFragment()
-                    titleString = "Gráfico Índice UV"
-                }
-                R.id.nav_voltage_uva -> {
-                    fragment = LightFragment()
-                    titleString = "Gráfico Voltaje UVA"
-                }
-                R.id.nav_nitrogen -> {
-                    fragment = NitrogenFragment()
-                    titleString = "Gráfico Nitrógeno (N)"
-                }
-                R.id.nav_phosphorus -> {
-                    fragment = PhosphorusFragment()
-                    titleString = "Gráfico Fósforo (P)"
-                }
-                R.id.nav_potassium -> {
-                    fragment = PotassiumFragment()
-                    titleString = "Gráfico Potasio (K)"
-                }
-                R.id.nav_gemini_ai -> {
-                    fragment = GeminiFragment()
-                    titleString = "Inteligencia Artificial"
-                }
-                R.id.nav_logout -> {
-                    auth.signOut()
-                    Toast.makeText(this, "Sesión cerrada.", Toast.LENGTH_SHORT).show()
-                    navigateToLogin()
-                }
-                else -> {
-                    Log.w(TAG, "Elemento de menú no reconocido: ${menuItem.itemId}")
-                }
-            }
-
-            fragment?.let {
-                replaceFragment(it)
-                supportActionBar?.title = titleString
-            }
-            binding.drawerLayout.closeDrawers()
-            true
-        }
+        binding.navView.setNavigationItemSelectedListener(this) // Establece 'this' como listener
 
         // Carga el HomeFragment al inicio de la actividad si no hay estado de instancia guardado
         if (savedInstanceState == null) {
@@ -166,6 +108,77 @@ class MainActivity : AppCompatActivity() {
             Log.d(TAG, "FCM Token: $token")
         }
     }
+
+    // Implementación del método de la interfaz OnNavigationItemSelectedListener
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        var fragment: Fragment? = null
+        var titleString: String? = null
+
+        when (item.itemId) {
+            R.id.nav_home -> {
+                fragment = HomeFragment()
+                titleString = "Clima y Sensores"
+            }
+            R.id.nav_crop_recommendation -> { // <-- ¡Lógica para el Fragmento de Recomendación de Cultivos!
+                fragment = CropRecommendationFragment()
+                titleString = "Recomendación de Cultivos"
+            }
+            R.id.nav_temperature_ambient -> {
+                fragment = TemperatureFragment()
+                titleString = "Gráfico Temperatura Ambiental"
+            }
+            R.id.nav_humidity -> {
+                fragment = HumidityFragment()
+                titleString = "Gráfico Humedad Ambiental"
+            }
+            R.id.nav_humidity_soil -> {
+                fragment = HumiditySoilFragment()
+                titleString = "Gráfico Humedad del Suelo"
+            }
+            R.id.nav_uv_index -> {
+                fragment = UvIndexFragment()
+                titleString = "Gráfico Índice UV"
+            }
+            R.id.nav_voltage_uva -> {
+                fragment = LightFragment()
+                titleString = "Gráfico Voltaje UVA"
+            }
+            R.id.nav_nitrogen -> {
+                fragment = NitrogenFragment()
+                titleString = "Gráfico Nitrógeno (N)"
+            }
+            R.id.nav_phosphorus -> {
+                fragment = PhosphorusFragment()
+                titleString = "Gráfico Fósforo (P)"
+            }
+            R.id.nav_potassium -> {
+                fragment = PotassiumFragment()
+                titleString = "Gráfico Potasio (K)"
+            }
+            R.id.nav_gemini_ai -> {
+                fragment = GeminiFragment()
+                titleString = "Inteligencia Artificial"
+            }
+            R.id.nav_logout -> {
+                auth.signOut()
+                Toast.makeText(this, "Sesión cerrada.", Toast.LENGTH_SHORT).show()
+                navigateToLogin()
+                binding.drawerLayout.closeDrawers() // Cerrar el cajón después de logout
+                return true // Retornar true ya que el evento fue manejado
+            }
+            else -> {
+                Log.w(TAG, "Elemento de menú no reconocido: ${item.itemId}")
+            }
+        }
+
+        fragment?.let {
+            replaceFragment(it)
+            supportActionBar?.title = titleString
+        }
+        binding.drawerLayout.closeDrawer(GravityCompat.START) // Cerrar el cajón
+        return true // El evento ha sido manejado
+    }
+
 
     // Función para leer datos de temperatura ambiental de Firebase
     private fun setupTemperatureAmbientalFirebaseListener() {

@@ -72,65 +72,57 @@ android {
 }
 
 dependencies {
-    // Librerías de AndroidX y Kotlin (Actualizadas)
-    // Core KTX para funciones de extensión básicas
+    // Librerías de AndroidX y Kotlin
     implementation("androidx.core:core-ktx:1.13.1")
-    // Fragment KTX para extensiones de fragmentos
     implementation("androidx.fragment:fragment-ktx:1.8.1")
-    // Activity KTX para extensiones de actividad (incluye lifecycle-runtime-ktx)
-    implementation("androidx.activity:activity-ktx:1.9.0") // Mantenemos 1.9.0
-    // LiveData y ViewModel KTX (¡CRUCIALES para SharedSensorViewModel!)
+    implementation("androidx.activity:activity-ktx:1.9.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.0")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.0")
-    // Nota: lifecycle-runtime-ktx suele venir con activity-ktx o se añade automáticamente.
-    // Si necesitas la versión específica: implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.0")
+    // Si necesitas lifecycle-runtime-ktx explícitamente:
+    // implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.0")
 
-    // Dependencias fundamentales de UI (Actualizadas)
-    implementation("androidx.appcompat:appcompat:1.7.0") // Mantenemos 1.7.0
-    implementation("com.google.android.material:material:1.12.0") // Mantenemos 1.12.0
-    implementation("androidx.drawerlayout:drawerlayout:1.2.0") // Mantenemos 1.2.0
+    // Dependencias fundamentales de UI
+    implementation("androidx.appcompat:appcompat:1.7.0")
+    implementation("com.google.android.material:material:1.12.0") // Eliminada la duplicidad
+    implementation("androidx.drawerlayout:drawerlayout:1.2.0")
 
-    // Librería de Gemini (Mantenemos la versión que funciona para ti)
+    // Librería de Gemini
     implementation("com.google.ai.client.generativeai:generativeai:0.8.0")
 
-    // Librerías de Jetpack Compose (Mantenemos las que ya tienes y el BOM)
-    // Asegúrate de que compileSdk y targetSdk en tu build.gradle.kts sean al menos 34 para Compose
-    val composeBom = platform("androidx.compose:compose-bom:2024.06.00") // Actualizado a una BOM más reciente
+    // Librerías de Jetpack Compose
+    val composeBom = platform("androidx.compose:compose-bom:2024.06.00")
     implementation(composeBom)
-    androidTestImplementation(composeBom) // También para tests de Compose
+    androidTestImplementation(composeBom)
 
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.material3:material3") // material3 es el más reciente
+    implementation("androidx.compose.material3:material3")
 
     // Librerías de Gráficos (MPAndroidChart)
     // Asegúrate de que tienes jitpack.io en tus repositories en settings.gradle.kts (project level)
-    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0") // Última versión estable
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0") // Eliminada la duplicidad
 
-    // Librerías de Firebase (El BOM gestiona las versiones, actualizado el BOM)
-    implementation(platform("com.google.firebase:firebase-bom:33.1.0")) // Actualizado a la versión más reciente a junio 2025
-    implementation("com.google.firebase:firebase-messaging-ktx") // Siempre usar KTX si está disponible
+    // Librerías de Firebase
+    implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
+    implementation("com.google.firebase:firebase-messaging-ktx")
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-database-ktx")
 
-    // Kotlin Coroutines para Firebase y otras tareas asíncronas (Actualizadas)
-    // Usa las versiones más recientes y coherentes
+    // Kotlin Coroutines para Firebase y otras tareas asíncronas
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.0")
 
-    // Librerías de Retrofit y OkHttp (para OpenWeatherMap - Actualizadas)
-    implementation("com.squareup.retrofit2:retrofit:2.11.0") // Actualizado Retrofit
-    implementation("com.squareup.retrofit2:converter-gson:2.11.0") // Actualizado Converter-Gson
-    implementation("com.squareup.okhttp3:okhttp:4.12.0") // Se mantiene 4.12.0, una de las últimas estables
+    // Librerías de Retrofit y OkHttp
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
-    // Librerías de Testing (Actualizadas)
+    // Librerías de Testing
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
-    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
-
 
     // Librerías de Debug para Compose
     debugImplementation("androidx.compose.ui:ui-tooling")

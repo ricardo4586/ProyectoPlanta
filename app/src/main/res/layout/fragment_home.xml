@@ -4,12 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
+    android:background="?attr/colorSurface"
     android:focusableInTouchMode="true"
     android:focusable="true"
     tools:context=".fragments.HomeFragment">
 
-    <!-- ScrollView para asegurar que todo el contenido sea visible y se ajuste en pantallas más pequeñas -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -19,13 +18,11 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <!-- ConstraintLayout interno para organizar los elementos dentro del ScrollView -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="16dp">
 
-            <!-- Sección de Consulta de Clima (PRIMERO) -->
             <TextView
                 android:id="@+id/tv_query_climate_title"
                 android:layout_width="0dp"
@@ -34,13 +31,12 @@
                 android:textSize="22sp"
                 android:textStyle="bold"
                 android:layout_marginTop="16dp"
-                android:textColor="@android:color/black"
+                android:textColor="?attr/colorOnSurface"
                 android:gravity="center_horizontal"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
-            <!-- Campo de entrada para el Nombre de la Ciudad -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/til_city_name"
                 android:layout_width="0dp"
@@ -51,8 +47,8 @@
                 app:boxCornerRadiusBottomStart="8dp"
                 app:boxCornerRadiusTopEnd="8dp"
                 app:boxCornerRadiusTopStart="8dp"
-                app:boxStrokeColor="@color/purple_200"
-                app:hintTextColor="@color/purple_200"
+                app:boxStrokeColor="?attr/colorPrimary"
+                app:hintTextColor="?attr/colorOnSurface"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_query_climate_title">
@@ -63,10 +59,9 @@
                     android:layout_height="wrap_content"
                     android:inputType="text"
                     android:singleLine="true"
-                    android:textColor="@android:color/black" />
+                    android:textColor="?attr/colorOnSurface" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Campo de entrada para el Nombre del País -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/til_country_name"
                 android:layout_width="0dp"
@@ -77,8 +72,8 @@
                 app:boxCornerRadiusBottomStart="8dp"
                 app:boxCornerRadiusTopEnd="8dp"
                 app:boxCornerRadiusTopStart="8dp"
-                app:boxStrokeColor="@color/purple_200"
-                app:hintTextColor="@color/purple_200"
+                app:boxStrokeColor="?attr/colorPrimary"
+                app:hintTextColor="?attr/colorOnSurface"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/til_city_name">
@@ -89,18 +84,17 @@
                     android:layout_height="wrap_content"
                     android:inputType="text"
                     android:singleLine="true"
-                    android:textColor="@android:color/black" />
+                    android:textColor="?attr/colorOnSurface" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Botón para obtener los datos del clima -->
             <Button
                 android:id="@+id/btn_get_climate"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:backgroundTint="@color/purple_500"
+                android:backgroundTint="?attr/colorPrimary"
                 android:text="OBTENER CLIMA"
-                android:textColor="@android:color/white"
+                android:textColor="?attr/colorOnPrimary"
                 android:paddingVertical="12dp"
                 android:textSize="16sp"
                 app:cornerRadius="8dp"
@@ -108,7 +102,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/til_country_name" />
 
-            <!-- Etiqueta de clima actual -->
             <TextView
                 android:id="@+id/tv_climate_actual_label"
                 android:layout_width="wrap_content"
@@ -117,11 +110,10 @@
                 android:text="Actual:"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:textColor="@android:color/black"
+                android:textColor="?attr/colorOnSurface"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/btn_get_climate" />
 
-            <!-- Valor de clima actual -->
             <TextView
                 android:id="@+id/tv_climate_actual_value"
                 android:layout_width="0dp"
@@ -129,12 +121,11 @@
                 android:layout_marginStart="8dp"
                 android:text="N/A"
                 android:textSize="18sp"
-                android:textColor="@android:color/black"
+                android:textColor="?attr/colorOnSurface"
                 app:layout_constraintBaseline_toBaselineOf="@+id/tv_climate_actual_label"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/tv_climate_actual_label" />
 
-            <!-- Etiqueta de clima mínimo -->
             <TextView
                 android:id="@+id/tv_climate_minima_label"
                 android:layout_width="wrap_content"
@@ -143,11 +134,10 @@
                 android:text="Mínima:"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:textColor="@android:color/black"
+                android:textColor="?attr/colorOnSurface"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_climate_actual_value" />
 
-            <!-- Valor de clima mínimo -->
             <TextView
                 android:id="@+id/tv_climate_minima_value"
                 android:layout_width="0dp"
@@ -155,12 +145,11 @@
                 android:layout_marginStart="8dp"
                 android:text="N/A"
                 android:textSize="18sp"
-                android:textColor="@android:color/black"
+                android:textColor="?attr/colorOnSurface"
                 app:layout_constraintBaseline_toBaselineOf="@+id/tv_climate_minima_label"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/tv_climate_minima_label" />
 
-            <!-- Etiqueta de clima máxima -->
             <TextView
                 android:id="@+id/tv_climate_maxima_label"
                 android:layout_width="wrap_content"
@@ -169,11 +158,10 @@
                 android:text="Máxima:"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:textColor="@android:color/black"
+                android:textColor="?attr/colorOnSurface"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_climate_minima_value" />
 
-            <!-- Valor de clima máximo -->
             <TextView
                 android:id="@+id/tv_climate_maxima_value"
                 android:layout_width="0dp"
@@ -181,12 +169,11 @@
                 android:layout_marginStart="8dp"
                 android:text="N/A"
                 android:textSize="18sp"
-                android:textColor="@android:color/black"
+                android:textColor="?attr/colorOnSurface"
                 app:layout_constraintBaseline_toBaselineOf="@+id/tv_climate_maxima_label"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/tv_climate_maxima_label" />
 
-            <!-- Sección de Datos Actuales de Sensores (SEGUNDO) -->
             <TextView
                 android:id="@+id/tv_sensor_data_title"
                 android:layout_width="0dp"
@@ -195,13 +182,12 @@
                 android:textSize="22sp"
                 android:textStyle="bold"
                 android:layout_marginTop="32dp"
-                android:textColor="@android:color/black"
+                android:textColor="?attr/colorOnSurface"
                 android:gravity="center_horizontal"
                 app:layout_constraintTop_toBottomOf="@+id/tv_climate_maxima_value"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
-            <!-- Cada TextView para los datos del sensor. IDs ajustados para tu código Kotlin. -->
             <TextView
                 android:id="@+id/tv_temperature"
                 android:layout_width="0dp"
@@ -209,7 +195,7 @@
                 android:layout_marginTop="16dp"
                 android:text="Temperatura Ambiental: -1.0 °C"
                 android:textSize="18sp"
-                android:textColor="@android:color/black"
+                android:textColor="?attr/colorOnSurface"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_sensor_data_title" />
@@ -221,7 +207,7 @@
                 android:layout_marginTop="8dp"
                 android:text="Humedad Ambiental: -1.0 %"
                 android:textSize="18sp"
-                android:textColor="@android:color/black"
+                android:textColor="?attr/colorOnSurface"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_temperature" />
@@ -233,7 +219,7 @@
                 android:layout_marginTop="8dp"
                 android:text="Humedad del Suelo: -1.0 %"
                 android:textSize="18sp"
-                android:textColor="@android:color/black"
+                android:textColor="?attr/colorOnSurface"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_humidity" />
@@ -245,7 +231,7 @@
                 android:layout_marginTop="8dp"
                 android:text="Índice UV: -1.0"
                 android:textSize="18sp"
-                android:textColor="@android:color/black"
+                android:textColor="?attr/colorOnSurface"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_humidity_soil" />
@@ -257,7 +243,7 @@
                 android:layout_marginTop="8dp"
                 android:text="Voltaje UVA: -1.0 V"
                 android:textSize="18sp"
-                android:textColor="@android:color/black"
+                android:textColor="?attr/colorOnSurface"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_uv_index" />
@@ -269,7 +255,7 @@
                 android:layout_marginTop="8dp"
                 android:text="Nitrógeno (N): -1"
                 android:textSize="18sp"
-                android:textColor="@android:color/black"
+                android:textColor="?attr/colorOnSurface"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_uva_voltage" />
@@ -281,7 +267,7 @@
                 android:layout_marginTop="8dp"
                 android:text="Fósforo (P): -1"
                 android:textSize="18sp"
-                android:textColor="@android:color/black"
+                android:textColor="?attr/colorOnSurface"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_nitrogen" />
@@ -293,7 +279,7 @@
                 android:layout_marginTop="8dp"
                 android:text="Potasio (K): -1"
                 android:textSize="18sp"
-                android:textColor="@android:color/black"
+                android:textColor="?attr/colorOnSurface"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_phosphorus"

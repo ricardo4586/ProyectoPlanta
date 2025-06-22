@@ -18,8 +18,9 @@ import com.example.proyectoplata.BuildConfig // Para la API Key de OpenWeatherMa
 import com.example.proyectoplata.databinding.FragmentHomeBinding // Para ViewBinding
 import com.example.proyectoplata.SharedSensorViewModel // ViewModel compartido
 import com.example.proyectoplata.models.NPKData // Modelo de datos para NPK
-import com.example.proyectoplata.network.ApiService // Interfaz Retrofit para la API del clima
-import com.example.proyectoplata.network.WeatherRepository // Repositorio para la lógica del clima
+// import com.example.proyectoplata.network.ApiService // Ya no necesitas importar ApiService directamente aquí, WeatherRepository lo maneja
+import com.example.proyectoplata.models.WeatherResponse // Modelo de respuesta de clima
+import com.example.proyectoplata.network.WeatherRepository // <-- ¡IMPORTACIÓN AÑADIDA!
 import com.github.mikephil.charting.data.Entry // Para gráficos (si los implementas con MPAndroidChart)
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -85,6 +86,9 @@ class HomeFragment : Fragment() {
     // Clave API para OpenWeatherMap (obtenida de BuildConfig).
     private val openWeatherApiKey = BuildConfig.OPEN_WEATHER_API_KEY
 
+    // Instancia perezosa (lazy) de WeatherRepository
+    private val weatherRepository: WeatherRepository by lazy { WeatherRepository() }
+
     /**
      * Se llama cuando el fragmento es creado por primera vez.
      * Aquí se inicializa el ViewModel compartido.
@@ -130,7 +134,7 @@ class HomeFragment : Fragment() {
         Log.d(TAG, "onCreateView: Elementos de UI del clima inicializados.")
 
         // Advertencia si la clave API de OpenWeatherMap no está configurada.
-        if (openWeatherApiKey.isNullOrEmpty()) {
+        if (openWeatherApiKey.isNullOrEmpty() || openWeatherApiKey == "YOUR_OPEN_WEATHER_API_KEY_HERE") {
             Log.e(TAG, "ERROR: La clave API de OpenWeatherMap no se encontró o no está configurada en BuildConfig.")
             Toast.makeText(requireContext(), "Advertencia: Clave API de OpenWeatherMap no configurada.", Toast.LENGTH_LONG).show()
         }
@@ -151,7 +155,7 @@ class HomeFragment : Fragment() {
             val ciudadNombre = ciudadNombreEditText.text.toString().trim()
             val paisNombre = paisNombreEditText.text.toString().trim()
 
-            if (openWeatherApiKey.isNullOrEmpty()) {
+            if (openWeatherApiKey.isNullOrEmpty() || openWeatherApiKey == "YOUR_OPEN_WEATHER_API_KEY_HERE") {
                 Toast.makeText(requireContext(), "Error: Clave API de OpenWeatherMap no configurada.", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
@@ -216,28 +220,36 @@ class HomeFragment : Fragment() {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 // Llama al repositorio para obtener los datos del clima.
-                val weather = WeatherRepository().fetchWeatherData(fullQuery, openWeatherApiKey)
+                // AHORA ESPERAMOS un retrofit2.Response<WeatherResponse>
+                val weatherResponse = weatherRepository.fetchWeatherData(fullQuery, openWeatherApiKey)
 
                 // Vuelve al hilo principal para actualizar la UI.
                 withContext(Dispatchers.Main) {
                     // Solo actualiza la UI si el fragmento todavía está activo y adjunto a una actividad.
                     if (isAdded) {
-                        if (weather != null) {
-                            // Actualiza los TextViews del clima con los datos obtenidos.
-                            // Aquí solo se asigna el VALOR numérico, ya que las etiquetas como "Actual:",
-                            // "Mínima:", "Máxima:" ya están definidas en el XML.
-                            binding.tvClimateActualValue.text = "%.1f°C".format(weather.main.temp)
-                            binding.tvClimateMinimaValue.text = "%.1f°C".format(weather.main.temp_min)
-                            binding.tvClimateMaximaValue.text = "%.1f°C".format(weather.main.temp_max)
-                            Log.d(TAG, "fetchWeatherData: Clima obtenido y UI actualizada: Actual=${weather.main.temp}, Minima=${weather.main.temp_min}, Maxima=${weather.main.temp_max}")
+                        if (weatherResponse.isSuccessful) {
+                            val weather = weatherResponse.body() // Obtenemos el cuerpo de la respuesta
+                            if (weather != null) {
+                                // Actualiza los TextViews del clima con los datos obtenidos.
+                                binding.tvClimateActualValue.text = "%.1f°C".format(weather.main.temp)
+                                binding.tvClimateMinimaValue.text = "%.1f°C".format(weather.main.temp_min)
+                                binding.tvClimateMaximaValue.text = "%.1f°C".format(weather.main.temp_max)
+                                Log.d(TAG, "fetchWeatherData: Clima obtenido y UI actualizada: Actual=${weather.main.temp}, Minima=${weather.main.temp_min}, Maxima=${weather.main.temp_max}")
+                            } else {
+                                // La llamada fue exitosa, pero el cuerpo de la respuesta fue nulo
+                                Toast.makeText(requireContext(), "Error al parsear datos de clima. Intente de nuevo.", Toast.LENGTH_SHORT).show()
+                                binding.tvClimateActualValue.text = "N/A"
+                                binding.tvClimateMinimaValue.text = "N/A"
+                                binding.tvClimateMaximaValue.text = "N/A"
+                                Log.w(TAG, "fetchWeatherData: Cuerpo de respuesta de clima nulo.")
+                            }
                         } else {
-                            // Muestra un mensaje de error si no se pudieron obtener los datos.
-                            Toast.makeText(requireContext(), "Error al obtener el clima. Verifique ciudad/código o conexión.", Toast.LENGTH_SHORT).show()
-                            // Establece valores por defecto o "N/A".
+                            // La llamada a la API no fue exitosa (código de error HTTP)
+                            Toast.makeText(requireContext(), "Error al obtener el clima: ${weatherResponse.code()} - ${weatherResponse.message()}", Toast.LENGTH_SHORT).show()
                             binding.tvClimateActualValue.text = "N/A"
                             binding.tvClimateMinimaValue.text = "N/A"
                             binding.tvClimateMaximaValue.text = "N/A"
-                            Log.w(TAG, "fetchWeatherData: No se pudo obtener datos de clima.")
+                            Log.w(TAG, "fetchWeatherData: Fallo en la llamada API de clima. Código: ${weatherResponse.code()}, Mensaje: ${weatherResponse.message()}")
                         }
                     }
                 }
@@ -580,35 +592,21 @@ class HomeFragment : Fragment() {
         })
 
         // Observador para el fósforo (P).
-        sharedSensorViewModel.fosforo.observe(viewLifecycleOwner, Observer { phos ->
-            tvFosforoActual.text = "Fósforo (P): $phos"
-            Log.d(TAG, "UI Update: tvFosforoActual = $phos")
+        sharedSensorViewModel.fosforo.observe(viewLifecycleOwner, Observer { fosfo ->
+            tvFosforoActual.text = "Fósforo (P): $fosfo"
+            Log.d(TAG, "UI Update: tvFosforoActual = $fosfo")
         })
 
         // Observador para el potasio (K).
-        sharedSensorViewModel.potasio.observe(viewLifecycleOwner, Observer { pot ->
-            tvPotasioActual.text = "Potasio (K): $pot"
-            Log.d(TAG, "UI Update: tvPotasioActual = $pot")
+        sharedSensorViewModel.potasio.observe(viewLifecycleOwner, Observer { potasio ->
+            tvPotasioActual.text = "Potasio (K): $potasio"
+            Log.d(TAG, "UI Update: tvPotasioActual = $potasio")
         })
     }
 
-    /**
-     * Se llama cuando la vista del fragmento está siendo destruida.
-     * Esto es importante para limpiar las referencias de ViewBinding y evitar fugas de memoria.
-     */
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null // Limpia la referencia al binding
-        Log.d(TAG, "onDestroyView: _binding nullified.")
-    }
-
-    // --- Funciones dummy / no implementadas en este fragmento ---
-    private fun attemptGeminiRecommendation() {
-        Log.d(TAG, "attemptGeminiRecommendation: Ignorado en HomeFragment. La lógica real está en GeminiFragment.")
-    }
-
-    private fun convertDateToTimestamp(dateString: String): Long {
-        Log.d(TAG, "convertDateToTimestamp: Ignorado en HomeFragment. Esta función no tiene implementación aquí.")
-        return -1L
+        _binding = null
+        Log.d(TAG, "onDestroyView: HomeFragment view destruida.")
     }
 }

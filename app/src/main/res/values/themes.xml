@@ -1,8 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <style name="Theme.ProyectoPlata" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Theme.Proyectoplata" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">@color/green_primary_500</item>        <item name="colorPrimaryVariant">@color/green_primary_700</item>   <item name="colorOnPrimary">@color/on_primary_color_light</item> <item name="colorSecondary">@color/brown_secondary_500</item>      <item name="colorSecondaryVariant">@color/brown_secondary_700</item> <item name="colorOnSecondary">@color/on_secondary_color_light</item> <item name="colorSurface">@color/surface_light</item>             <item name="colorOnSurface">@color/on_surface_light</item>       <item name="android:colorBackground">@color/background_light</item> <item name="colorOnBackground">@color/on_background_light</item> <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <item name="android:navigationBarColor" tools:targetApi="l">?attr/colorSurface</item>
+
+        <item name="android:textColorPrimary">?attr/colorOnSurface</item>      <item name="android:textColorSecondary">?attr/colorOnSurface</item>   <item name="textInputStyle">@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox</item>
+        <item name="toolbarStyle">@style/Widget.MaterialComponents.Toolbar.PrimarySurface</item>
+        <item name="actionBarPopupTheme">@style/ThemeOverlay.MaterialComponents.Light</item>
+        <item name="materialButtonStyle">@style/Widget.MaterialComponents.Button</item>
+
     </style>
+
+    <style name="Theme.Proyectoplata.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.Proyectoplata.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar" />
+    <style name="Theme.Proyectoplata.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Light" />
+
 </resources>

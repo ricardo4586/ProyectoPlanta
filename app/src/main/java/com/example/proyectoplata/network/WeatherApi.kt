@@ -2,6 +2,7 @@ package com.example.proyectoplata.network
 
 import retrofit2.http.GET
 import retrofit2.http.Query
+import com.example.proyectoplata.models.WeatherResponse // <--- ¡Importación corregida aquí!
 
 interface WeatherApiService {
     @GET("data/2.5/weather") // La ruta base de la API de OpenWeatherMap

@@ -7,6 +7,9 @@
         <item
             android:id="@+id/nav_home"
             android:title="Clima y Sensores (Actual)" />
+        <item
+            android:id="@+id/nav_crop_recommendation"
+            android:title="Recomendación de Cultivos" />
 
         <item android:title="Temperatura">
             <menu>

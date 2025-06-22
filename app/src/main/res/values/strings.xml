@@ -5,16 +5,31 @@
     <string name="nav_header_title">Usuario</string>
     <string name="nav_header_subtitle">tu_email@ejemplo.com</string>
     <string name="nav_header_desc">Encabezado de navegación</string>
-
     <string name="openDrawer">Abrir cajón de navegación</string>
     <string name="closeDrawer">Cerrar cajón de navegación</string>
-
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="action_settings">Settings</string>
-    <string name="menu_home">Inicio</string>
+
+    <string name="action_settings">Configuración</string> <string name="menu_home">Inicio</string>
     <string name="menu_gallery">Galería</string>
     <string name="menu_slideshow">Presentación</string>
 
+    <string name="login_title">Iniciar Sesión</string>
+    <string name="email_hint">Correo electrónico</string>
+    <string name="password_hint">Contraseña</string>
+    <string name="login_button">Iniciar Sesión</string>
+    <string name="register_link_text">¿No tienes cuenta? Regístrate aquí</string>
+
+    <string name="register_title">Registrarse</string>
+    <string name="confirm_password_hint">Confirmar Contraseña</string>
+    <string name="register_button">Registrarse</string>
+    <string name="login_link_text">¿Ya tienes cuenta? Inicia sesión aquí</string>
+
+    <string name="recommendations_title">Recomendación de Cultivos</string>
+    <string name="select_month_label">Selecciona un mes:</string>
+    <string name="city_hint">Nombre de la Ciudad</string>
+    <string name="country_hint">Nombre del País</string>
+    <string name="get_recommendation_button">Obtener Recomendación</string>
+    <string name="recommendation_placeholder">Las recomendaciones aparecerán aquí.</string>
 
 </resources>
