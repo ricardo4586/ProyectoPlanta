@@ -32,4 +32,15 @@
     <string name="get_recommendation_button">Obtener Recomendación</string>
     <string name="recommendation_placeholder">Las recomendaciones aparecerán aquí.</string>
 
+    <string-array name="sensor_types_array">
+        <item>Humedad Ambiental</item>
+        <item>Humedad del Suelo</item>
+        <item>Temperatura</item>
+        <item>Voltaje UVA</item>
+        <item>Nitrógeno (N)</item>
+        <item>Fósforo (P)</item>
+        <item>Potasio (K)</item>
+        <item>Índice UV</item>
+    </string-array>
+
 </resources>

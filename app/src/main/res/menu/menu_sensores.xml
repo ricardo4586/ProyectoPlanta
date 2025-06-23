@@ -11,6 +11,10 @@
             android:id="@+id/nav_crop_recommendation"
             android:title="Recomendación de Cultivos" />
 
+        <item
+            android:id="@+id/nav_history"
+            android:title="Historial de Datos" />
+
         <item android:title="Temperatura">
             <menu>
                 <item
@@ -34,7 +38,7 @@
             <menu>
                 <item
                     android:id="@+id/nav_uv_index"
-                    android:title="Índice UV" />
+                android:title="Índice UV" />
                 <item
                     android:id="@+id/nav_voltage_uva"
                     android:title="Voltaje UVA" />
@@ -47,7 +51,8 @@
                     android:id="@+id/nav_nitrogen"
                     android:title="Nitrógeno (N)" />
                 <item
-                    android:id="@+id/nav_phosphorus"  android:title="Fósforo (P)" />
+                    android:id="@+id/nav_phosphorus"
+                    android:title="Fósforo (P)" />
                 <item
                     android:id="@+id/nav_potassium"
                     android:title="Potasio (K)" />

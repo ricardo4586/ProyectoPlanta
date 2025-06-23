@@ -3,34 +3,29 @@ package com.example.proyectoplata
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.MenuItem // Necesario para onNavigationItemSelected
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.GravityCompat // Necesario para closeDrawers
+import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.proyectoplata.databinding.ActivityMainBinding
 import com.google.firebase.auth.FirebaseAuth
 
-// Importaciones de Firebase para la base de datos y mensajes
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.messaging.FirebaseMessaging
 
-// Importación para MPAndroidChart
 import com.github.mikephil.charting.data.Entry
 
-// Importaciones para formato de fecha/hora
 import java.text.SimpleDateFormat
 import java.util.*
 
-// *** IMPORTACIÓN CRUCIAL PARA SharedSensorViewModel ***
 import com.example.proyectoplata.SharedSensorViewModel
 
-// Importaciones de tus fragmentos (asegúrate de que estas rutas sean correctas)
 import com.example.proyectoplata.fragments.HomeFragment
 import com.example.proyectoplata.fragments.TemperatureFragment
 import com.example.proyectoplata.fragments.HumidityFragment
@@ -41,16 +36,17 @@ import com.example.proyectoplata.fragments.NitrogenFragment
 import com.example.proyectoplata.fragments.PhosphorusFragment
 import com.example.proyectoplata.fragments.PotassiumFragment
 import com.example.proyectoplata.fragments.GeminiFragment
-import com.example.proyectoplata.fragments.CropRecommendationFragment // Importación añadida para CropRecommendationFragment
+import com.example.proyectoplata.fragments.CropRecommendationFragment
+import com.example.proyectoplata.fragments.HistoryFragment // <-- ¡IMPORTACIÓN NECESARIA PARA HistoryFragment!
 
 
-class MainActivity : AppCompatActivity(), com.google.android.material.navigation.NavigationView.OnNavigationItemSelectedListener { // Implementar la interfaz
+class MainActivity : AppCompatActivity(), com.google.android.material.navigation.NavigationView.OnNavigationItemSelectedListener {
 
-    private val TAG = "MainActivity" // Para los logs
+    private val TAG = "MainActivity"
     private lateinit var binding: ActivityMainBinding
     private lateinit var auth: FirebaseAuth
     private lateinit var sharedSensorViewModel: SharedSensorViewModel
-    private lateinit var firebaseDatabase: FirebaseDatabase // Declaración de la instancia de FirebaseDatabase
+    private lateinit var firebaseDatabase: FirebaseDatabase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,25 +54,20 @@ class MainActivity : AppCompatActivity(), com.google.android.material.navigation
         setContentView(binding.root)
 
         auth = FirebaseAuth.getInstance()
-        firebaseDatabase = FirebaseDatabase.getInstance() // Inicialización de FirebaseDatabase
+        firebaseDatabase = FirebaseDatabase.getInstance()
 
-        // Redirige al usuario a la pantalla de inicio de sesión si no está autenticado
         if (auth.currentUser == null) {
             navigateToLogin()
             return
         }
 
-        // Inicializa el ViewModel compartido para la comunicación de datos entre fragmentos
         sharedSensorViewModel = ViewModelProvider(this)[SharedSensorViewModel::class.java]
 
-        // Llamada a la función para leer datos de temperatura ambiental de Firebase
         setupTemperatureAmbientalFirebaseListener()
 
 
-        // Configura la barra de herramientas como la barra de acción de la actividad
         setSupportActionBar(binding.toolbar)
 
-        // Configura el botón de alternancia del cajón de navegación (icono de hamburguesa)
         val toggle = ActionBarDrawerToggle(
             this,
             binding.drawerLayout,
@@ -87,18 +78,14 @@ class MainActivity : AppCompatActivity(), com.google.android.material.navigation
         binding.drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
 
-        // Configura el listener para los elementos seleccionados en el menú de navegación
-        binding.navView.setNavigationItemSelectedListener(this) // Establece 'this' como listener
+        binding.navView.setNavigationItemSelectedListener(this)
 
-        // Carga el HomeFragment al inicio de la actividad si no hay estado de instancia guardado
         if (savedInstanceState == null) {
             replaceFragment(HomeFragment())
             supportActionBar?.title = "Clima y Sensores"
-            // Selecciona visualmente el elemento "Home" al inicio
             binding.navView.setCheckedItem(R.id.nav_home)
         }
 
-        // Obtiene y registra el token de FCM (para notificaciones push)
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (!task.isSuccessful) {
                 Log.w(TAG, "Fallo al obtener el token de registro de FCM", task.exception)
@@ -107,12 +94,10 @@ class MainActivity : AppCompatActivity(), com.google.android.material.navigation
             val token = task.result
             Log.d(TAG, "FCM Token: $token")
 
-            // *** AÑADIDO: Guardar el token en Firebase Realtime Database ***
             saveFCMTokenToDatabase(token)
         }
     }
 
-    // Implementación del método de la interfaz OnNavigationItemSelectedListener
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         var fragment: Fragment? = null
         var titleString: String? = null
@@ -122,9 +107,13 @@ class MainActivity : AppCompatActivity(), com.google.android.material.navigation
                 fragment = HomeFragment()
                 titleString = "Clima y Sensores"
             }
-            R.id.nav_crop_recommendation -> { // <-- ¡Lógica para el Fragmento de Recomendación de Cultivos!
+            R.id.nav_crop_recommendation -> {
                 fragment = CropRecommendationFragment()
                 titleString = "Recomendación de Cultivos"
+            }
+            R.id.nav_history -> { // <-- ¡NUEVA CATEGORÍA AÑADIDA AQUÍ!
+                fragment = HistoryFragment()
+                titleString = "Historial de Datos"
             }
             R.id.nav_temperature_ambient -> {
                 fragment = TemperatureFragment()
@@ -166,8 +155,8 @@ class MainActivity : AppCompatActivity(), com.google.android.material.navigation
                 auth.signOut()
                 Toast.makeText(this, "Sesión cerrada.", Toast.LENGTH_SHORT).show()
                 navigateToLogin()
-                binding.drawerLayout.closeDrawers() // Cerrar el cajón después de logout
-                return true // Retornar true ya que el evento fue manejado
+                binding.drawerLayout.closeDrawers()
+                return true
             }
             else -> {
                 Log.w(TAG, "Elemento de menú no reconocido: ${item.itemId}")
@@ -178,19 +167,18 @@ class MainActivity : AppCompatActivity(), com.google.android.material.navigation
             replaceFragment(it)
             supportActionBar?.title = titleString
         }
-        binding.drawerLayout.closeDrawer(GravityCompat.START) // Cerrar el cajón
-        return true // El evento ha sido manejado
+        binding.drawerLayout.closeDrawer(GravityCompat.START)
+        return true
     }
 
 
-    // Función para leer datos de temperatura ambiental de Firebase
     private fun setupTemperatureAmbientalFirebaseListener() {
         val ref = firebaseDatabase.getReference("mediciones/temperatura_ambiental")
         ref.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val entries = ArrayList<Entry>()
                 for (childSnapshot in snapshot.children) {
-                    val key = childSnapshot.key // Por ejemplo: "YYYY-MM-DD_HH-mm-ss"
+                    val key = childSnapshot.key
                     val value = childSnapshot.getValue(Float::class.java)
 
                     if (key != null && value != null) {
@@ -198,15 +186,15 @@ class MainActivity : AppCompatActivity(), com.google.android.material.navigation
                             val dateFormat = SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.getDefault())
                             val date = dateFormat.parse(key)
                             if (date != null) {
-                                entries.add(Entry(date.time.toFloat(), value)) // x: timestamp, y: value
+                                entries.add(Entry(date.time.toFloat(), value))
                             }
                         } catch (e: Exception) {
                             Log.e(TAG, "Error al parsear fecha para temperatura ambiental: ${e.message}")
                         }
                     }
                 }
-                entries.sortBy { it.x } // Asegurarse de que los datos estén ordenados por tiempo
-                sharedSensorViewModel.updateTemperatureEntries(entries) // Envía los datos a tu ViewModel
+                entries.sortBy { it.x }
+                sharedSensorViewModel.updateTemperatureEntries(entries)
                 Log.d(TAG, "Datos de temperatura ambiental de Firebase procesados: ${entries.size} entradas.")
             }
 
@@ -216,28 +204,22 @@ class MainActivity : AppCompatActivity(), com.google.android.material.navigation
         })
     }
 
-    // Función auxiliar para reemplazar el fragmento actual en el contenedor principal
     private fun replaceFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
-            .replace(R.id.content_frame, fragment)
+            .replace(R.id.content_frame, fragment) // Asegúrate de que R.id.content_frame sea el ID correcto de tu FrameLayout/FragmentContainerView
             .commit()
     }
 
-    // Función auxiliar para navegar a LoginActivity y finalizar la actividad actual
     private fun navigateToLogin() {
         val intent = Intent(this, LoginActivity::class.java)
         startActivity(intent)
         finish()
     }
 
-    // *** NUEVA FUNCIÓN PARA GUARDAR EL TOKEN FCM EN LA BASE DE DATOS ***
     private fun saveFCMTokenToDatabase(token: String?) {
-        val userId = auth.currentUser?.uid // Obtén el ID del usuario actual si está logueado
+        val userId = auth.currentUser?.uid
         if (userId != null && token != null) {
             val database = FirebaseDatabase.getInstance()
-            // Guarda el token bajo el nodo de usuario (ej. /users/<userId>/fcmToken)
-            // Esto es CRUCIAL para que tu backend sepa a dónde enviar las notificaciones.
-            // Puedes adaptar esta ruta a tu estructura de datos específica.
             database.getReference("users").child(userId).child("fcmToken").setValue(token)
                 .addOnSuccessListener {
                     Log.d(TAG, "FCM token saved to database for user: $userId")
@@ -246,12 +228,7 @@ class MainActivity : AppCompatActivity(), com.google.android.material.navigation
                     Log.e(TAG, "Failed to save FCM token to database for user: $userId", e)
                 }
         } else if (token != null) {
-            // Si no hay un usuario autenticado (ej. usuario anónimo), puedes guardar el token bajo un nodo general
-            // o usar un ID de dispositivo único si lo generas en otra parte.
-            // Asegúrate de que tu backend tenga una forma de asociar estos tokens a los datos del sensor.
             Log.d(TAG, "No user logged in. FCM token obtained: $token. Cannot save to specific user.")
-            // Opcional: Podrías guardar tokens no asociados a usuarios en un nodo diferente si es necesario
-            // firebaseDatabase.getReference("anonymousFcmTokens").child(token).setValue(true)
         } else {
             Log.d(TAG, "FCM token is null, cannot save.")
         }

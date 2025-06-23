@@ -10,15 +10,16 @@
 
     <color name="on_primary_color_light">#FFFFFF</color>
     <color name="on_secondary_color_light">#FFFFFF</color>
-
     <color name="surface_light">#FFFFFF</color>
     <color name="on_surface_light">#FF000000</color>
-
-
     <color name="background_light">#F5F5F5</color>
     <color name="on_background_light">#FF000000</color>
+
     <color name="notification_color">@color/green_primary_500</color>
-    <color name="chart_fill_color">#A5D6A7</color>
+
+    <color name="chart_line_color">@color/green_primary_500</color>
+    <color name="chart_fill_color">@color/green_primary_200</color>
+
 
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
@@ -29,5 +30,4 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <color name="chart_line_color">@color/green_primary_500</color>
-</resources>
+    <color name="chart_humidity_ambiental">#00BFFF</color> <color name="chart_humidity_soil">#4CAF50</color>    <color name="chart_temperature">#FF0000</color>     <color name="chart_light">#FF5722</color>           <color name="chart_nitrogen">#8A2BE2</color>        <color name="chart_phosphorus">#00FF00</color>      <color name="chart_potassium">#FFFF00</color>       <color name="chart_uv_index">#FFC107</color>        </resources>
